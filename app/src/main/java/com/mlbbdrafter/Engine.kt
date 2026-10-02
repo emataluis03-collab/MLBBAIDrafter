@@ -55,11 +55,14 @@ object Engine {
             val c = pool.filter { r in it.roles }
             val raw = c.map { h ->
                 mapOf<String, Double?>(
-                    "synergy" to avg(d.allyPicks.mapNotNull { ds.syn(h.id, it) }),
-                    "counter" to avg(d.enemyPicks.mapNotNull { ds.mu(h.id, it) }),
-                    "winRate" to (h.roleWr[r] ?: h.winRate), "pickRate" to h.pickRate, "personal" to h.personal)
+                    "synergy" to (avg(d.allyPicks.mapNotNull { ds.syn(h.id, it) }) ?: h.synergyScore?.let { 50.0 + it * 50.0 }),
+                    "counter" to (avg(d.enemyPicks.mapNotNull { ds.mu(h.id, it) }) ?: h.counterScore?.let { 50.0 + it * 50.0 }),
+                    "winRate" to (h.roleWr[r] ?: h.winRate), "pickRate" to h.pickRate,
+                    // Personal performance is optional. The supplied meta/first-pick data are
+                    // shown separately and used as deterministic tie-breakers, not invented stats.
+                    "personal" to h.personal)
             }
-            combine(c, raw, w).take(2)
+            combine(c, raw, w).sortedWith(compareByDescending<Scored> { it.score }.thenByDescending { it.hero.metaScore ?: -999.0 }.thenByDescending { it.hero.firstPickScore ?: -999.0 }).take(2)
         }
     }
 

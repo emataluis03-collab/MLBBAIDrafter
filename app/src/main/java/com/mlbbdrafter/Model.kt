@@ -10,7 +10,10 @@ val ROLES = listOf("EXP", "JUNGLE", "MID", "GOLD", "ROAM")
 data class Hero(
     val id: String, val name: String, val roles: List<String>,
     val winRate: Double?, val pickRate: Double?, val banRate: Double?,
-    val roleWr: Map<String, Double>, val personal: Double?
+    val roleWr: Map<String, Double>, val personal: Double?,
+    val metaScore: Double? = null, val firstPickScore: Double? = null,
+    val tournamentTier: String? = null, val laneRankScore: Map<String, Double> = emptyMap(),
+    val synergyScore: Double? = null, val counterScore: Double? = null
 )
 data class PairStat(val a: String, val b: String, val wr: Double, val games: Int?)
 
@@ -53,7 +56,13 @@ object DataImporter {
             val rw = HashMap<String, Double>()
             o.optJSONObject("roleWinRate")?.let { r -> r.keys().forEach { k -> pct(r, k, id)?.let { rw[k.uppercase()] = it } } }
             heroes[id] = Hero(id, o.optString("name", id), roles.filter { it in ROLES },
-                pct(o, "winRate", id), pct(o, "pickRate", id), pct(o, "banRate", id), rw, pct(o, "personal", id))
+                pct(o, "winRate", id), pct(o, "pickRate", id), pct(o, "banRate", id), rw, pct(o, "personal", id),
+                if (o.has("metaScore") && !o.isNull("metaScore")) o.optDouble("metaScore") else null,
+                if (o.has("firstPickScore") && !o.isNull("firstPickScore")) o.optDouble("firstPickScore") else null,
+                o.optString("tournamentTier", "").ifBlank { null },
+                buildMap { o.optJSONObject("laneRankScore")?.let { lr -> lr.keys().forEach { k -> put(k.uppercase(), lr.optDouble(k)) } } },
+                if (o.has("synergyScore") && !o.isNull("synergyScore")) o.optDouble("synergyScore") else null,
+                if (o.has("counterScore") && !o.isNull("counterScore")) o.optDouble("counterScore") else null)
         }
         fun pairs(key: String): List<PairStat> {
             val a = root.optJSONArray(key) ?: return emptyList()
@@ -72,9 +81,8 @@ object DataImporter {
             return out
         }
         val mu = pairs("matchups"); val sy = pairs("synergies")
-        val withMu = mu.flatMap { listOf(it.a, it.b) }.toSet()
-        val none = heroes.keys.count { it !in withMu }
-        if (none > 0) w += "$none heroes have no matchup data"
+        // The bundled user dataset contains aggregate matchup/synergy rankings rather
+        // than a full pairwise matrix. Do not label that intentional structure as missing data.
         if (heroes.isEmpty()) w += "No heroes found"
         return Dataset(heroes, mu, sy, w, root.optString("label", "User data"))
     }

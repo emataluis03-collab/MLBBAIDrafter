@@ -233,7 +233,7 @@ class OverlayService : Service() {
         }
         panel.addView(row(title, min, close, height = 34))
 
-        val dataLabel = label("DATA  ${ds.label.uppercase()}", 7.2f, muted).apply {
+        val dataLabel = label("DATA  ${ds.label.uppercase()}  •  ${ds.heroes.size} HEROES", 7.0f, muted).apply {
             gravity = Gravity.CENTER
             setPadding(0, 0, 0, dp(2))
         }
@@ -392,14 +392,16 @@ class OverlayService : Service() {
 
         val all = pickMap.values.flatten()
         val rankPick = all.maxByOrNull { it.score }
+        val tierValue = mapOf("SS" to 6, "S" to 5, "A" to 4, "B" to 3, "C" to 2, "D" to 1)
         val tournamentPick = ds.heroes.values
-            .filter { it.id !in d.used() }
+            .filter { it.id !in d.used() && it.tournamentTier != null }
             .mapNotNull { h ->
+                val tier = tierValue[h.tournamentTier] ?: return@mapNotNull null
                 val roleCount = h.roles.distinct().size
-                if (roleCount == 0) null
-                else Triple(h, roleCount, all.filter { it.hero.id == h.id }.maxOfOrNull { it.score } ?: 0.0)
+                val rankScore = all.filter { it.hero.id == h.id }.maxOfOrNull { it.score } ?: 0.0
+                Triple(h, tier, rankScore + roleCount * 0.001)
             }
-            .maxWithOrNull(compareBy<Triple<Hero, Int, Double>> { it.second }.thenBy { it.third })
+            .maxWithOrNull(compareBy<Triple<Hero, Int, Double>> { it.second }.thenByDescending { it.third })
 
         addSectionHeader(content, ">> PRIORITY PICKS <<")
         val priority = LinearLayout(this).apply {
@@ -418,7 +420,7 @@ class OverlayService : Service() {
             }
         }
         priority.addView(priorityCard("★ RANK PICK", rankPick?.hero, if (rankPick == null) "no data" else "score ${"%.0f".format(rankPick.score)}", neon))
-        priority.addView(priorityCard("◎ TOURNAMENT PICK", tournamentPick?.first, if (tournamentPick == null) "no role data" else "${tournamentPick.second} roles", amber))
+        priority.addView(priorityCard("◎ TOURNAMENT PICK", tournamentPick?.first, if (tournamentPick == null) "no tier data" else "${tournamentPick.first.tournamentTier} TIER", amber))
         content.addView(priority)
 
         addSectionHeader(content, ">> BAN PRIORITY <<")
@@ -502,14 +504,11 @@ class OverlayService : Service() {
         if (title == "Ally pick") {
             val scored = Engine.picks(ds, d, SettingsManager.pick(this)).values.flatten()
             val mainHero = scored.maxByOrNull { it.score }?.hero
-            val widestHero = ds.heroes.values
-                .filter { it.id !in d.used() }
-                .mapNotNull { h ->
-                    val roleCount = h.roles.distinct().size
-                    if (roleCount == 0) null
-                    else Triple(h, roleCount, scored.filter { it.hero.id == h.id }.maxOfOrNull { it.score } ?: 0.0)
-                }
-                .maxWithOrNull(compareBy<Triple<Hero, Int, Double>> { it.second }.thenBy { it.third })?.first
+            val tierValue = mapOf("SS" to 6, "S" to 5, "A" to 4, "B" to 3, "C" to 2, "D" to 1)
+            val tournamentHero = ds.heroes.values
+                .filter { it.id !in d.used() && it.tournamentTier != null }
+                .maxWithOrNull(compareBy<Hero> { tierValue[it.tournamentTier] ?: 0 }
+                    .thenBy { scored.filter { s -> s.hero.id == it.id }.maxOfOrNull { s -> s.score } ?: 0.0 })
 
             val quick = LinearLayout(this).apply {
                 orientation = LinearLayout.HORIZONTAL
@@ -534,9 +533,9 @@ class OverlayService : Service() {
                     mainHero?.let { d.add(target, it.id); refresh(); dialogRef?.dismiss() }
                 }
             })
-            quick.addView(quickButton("◎ TOURNAMENT PICK", widestHero, amber).apply {
+            quick.addView(quickButton("◎ TOURNAMENT PICK", tournamentHero, amber).apply {
                 setOnClickListener {
-                    widestHero?.let { d.add(target, it.id); refresh(); dialogRef?.dismiss() }
+                    tournamentHero?.let { d.add(target, it.id); refresh(); dialogRef?.dismiss() }
                 }
             })
             wrap.addView(quick, LinearLayout.LayoutParams(-1, dp(48)))
