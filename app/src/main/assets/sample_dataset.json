@@ -1,26 +1,3464 @@
 {
- "label": "SAMPLE - NOT REAL STATISTICS. Import your own data.",
- "heroes": [
-  {"id":"s_exp1","name":"SampleExp1","roles":["EXP"],"winRate":51,"pickRate":10,"banRate":5,"roleWinRate":{"EXP":52}},
-  {"id":"s_exp2","name":"SampleExp2","roles":["EXP"],"winRate":49,"pickRate":8,"banRate":3,"roleWinRate":{"EXP":49}},
-  {"id":"s_jg1","name":"SampleJg1","roles":["JUNGLE"],"winRate":52,"pickRate":12,"banRate":9,"roleWinRate":{"JUNGLE":52}},
-  {"id":"s_jg2","name":"SampleJg2","roles":["JUNGLE"],"winRate":48,"pickRate":6,"banRate":2},
-  {"id":"s_mid1","name":"SampleMid1","roles":["MID"],"winRate":50,"pickRate":9,"banRate":4},
-  {"id":"s_mid2","name":"SampleMid2","roles":["MID"],"winRate":53,"pickRate":7,"banRate":6},
-  {"id":"s_gold1","name":"SampleGold1","roles":["GOLD"],"winRate":51,"pickRate":11,"banRate":7},
-  {"id":"s_gold2","name":"SampleGold2","roles":["GOLD"],"winRate":47,"pickRate":5,"banRate":1},
-  {"id":"s_roam1","name":"SampleRoam1","roles":["ROAM"],"winRate":50,"pickRate":8,"banRate":3},
-  {"id":"s_roam2","name":"SampleRoam2","roles":["ROAM"],"winRate":52,"pickRate":6,"banRate":4}
- ],
- "matchups": [
-  {"a":"s_exp1","b":"s_exp2","winRate":54,"games":1000},
-  {"a":"s_jg1","b":"s_jg2","winRate":55,"games":800},
-  {"a":"s_mid2","b":"s_mid1","winRate":53,"games":600},
-  {"a":"s_jg1","b":"s_gold2","winRate":56,"games":300}
- ],
- "synergies": [
-  {"a":"s_exp1","b":"s_roam2","winRate":54,"games":500},
-  {"a":"s_jg1","b":"s_mid2","winRate":55,"games":400},
-  {"a":"s_gold1","b":"s_roam1","winRate":53,"games":450}
- ]
+  "label": "USER SUPPLIED • META + RANK + TOURNAMENT DATA",
+  "heroes": [
+    {
+      "id": "Aulus",
+      "name": "Aulus",
+      "roles": [
+        "JUNGLE",
+        "EXP"
+      ],
+      "winRate": 59.4,
+      "pickRate": 1.01,
+      "banRate": 15.79,
+      "roleWinRate": {
+        "JUNGLE": 59.4,
+        "EXP": 59.4
+      },
+      "personal": null,
+      "metaScore": 3.2,
+      "firstPickScore": null,
+      "tournamentTier": "C",
+      "laneRankScore": {
+        "JUNGLE": 3.22
+      },
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Rafaela",
+      "name": "Rafaela",
+      "roles": [
+        "ROAM"
+      ],
+      "winRate": 59.33,
+      "pickRate": 1.22,
+      "banRate": 16.66,
+      "roleWinRate": {
+        "ROAM": 59.33
+      },
+      "personal": null,
+      "metaScore": 3.8,
+      "firstPickScore": 4.01,
+      "tournamentTier": "B",
+      "laneRankScore": {
+        "ROAM": 3.79
+      },
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": 0.16
+    },
+    {
+      "id": "Masha",
+      "name": "Masha",
+      "roles": [
+        "EXP"
+      ],
+      "winRate": 59.23,
+      "pickRate": 0.68,
+      "banRate": 27.33,
+      "roleWinRate": {
+        "EXP": 59.23
+      },
+      "personal": null,
+      "metaScore": 3.0,
+      "firstPickScore": null,
+      "tournamentTier": "B",
+      "laneRankScore": {
+        "EXP": 2.97
+      },
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Marcel",
+      "name": "Marcel",
+      "roles": [
+        "ROAM"
+      ],
+      "winRate": 58.15,
+      "pickRate": 0.28,
+      "banRate": 33.3,
+      "roleWinRate": {
+        "ROAM": 58.15
+      },
+      "personal": null,
+      "metaScore": 1.9,
+      "firstPickScore": null,
+      "tournamentTier": "SS",
+      "laneRankScore": {
+        "ROAM": 1.87
+      },
+      "sourceBestVsRate": 0.59,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": 0.22
+    },
+    {
+      "id": "Argus",
+      "name": "Argus",
+      "roles": [
+        "EXP"
+      ],
+      "winRate": 55.53,
+      "pickRate": 0.61,
+      "banRate": 1.37,
+      "roleWinRate": {
+        "EXP": 55.53
+      },
+      "personal": null,
+      "metaScore": 1.7,
+      "firstPickScore": null,
+      "tournamentTier": "C",
+      "laneRankScore": {
+        "EXP": 1.74
+      },
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Minotaur",
+      "name": "Minotaur",
+      "roles": [
+        "ROAM"
+      ],
+      "winRate": 54.95,
+      "pickRate": 1.06,
+      "banRate": 7.29,
+      "roleWinRate": {
+        "ROAM": 54.95
+      },
+      "personal": null,
+      "metaScore": 1.9,
+      "firstPickScore": null,
+      "tournamentTier": "A",
+      "laneRankScore": {
+        "ROAM": 1.95
+      },
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Khufra",
+      "name": "Khufra",
+      "roles": [
+        "ROAM"
+      ],
+      "winRate": 54.56,
+      "pickRate": 0.31,
+      "banRate": 1.98,
+      "roleWinRate": {
+        "ROAM": 54.56
+      },
+      "personal": null,
+      "metaScore": 1.1,
+      "firstPickScore": null,
+      "tournamentTier": "B",
+      "laneRankScore": {
+        "ROAM": 1.1
+      },
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Popol and Kupa",
+      "name": "Popol and Kupa",
+      "roles": [
+        "JUNGLE",
+        "GOLD"
+      ],
+      "winRate": 54.16,
+      "pickRate": 0.48,
+      "banRate": 0.28,
+      "roleWinRate": {
+        "JUNGLE": 54.16,
+        "GOLD": 54.16
+      },
+      "personal": null,
+      "metaScore": 1.1,
+      "firstPickScore": null,
+      "tournamentTier": "C",
+      "laneRankScore": {
+        "GOLD": 1.1,
+        "JUNGLE": 1.1
+      },
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Gloo",
+      "name": "Gloo",
+      "roles": [
+        "ROAM",
+        "EXP"
+      ],
+      "winRate": 54.15,
+      "pickRate": 0.73,
+      "banRate": 38.08,
+      "roleWinRate": {
+        "ROAM": 54.15,
+        "EXP": 54.15
+      },
+      "personal": null,
+      "metaScore": 1.4,
+      "firstPickScore": null,
+      "tournamentTier": "SS",
+      "laneRankScore": {
+        "EXP": 1.36,
+        "ROAM": 1.36
+      },
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Lolita",
+      "name": "Lolita",
+      "roles": [
+        "ROAM"
+      ],
+      "winRate": 54.15,
+      "pickRate": 0.08,
+      "banRate": 0.18,
+      "roleWinRate": {
+        "ROAM": 54.15
+      },
+      "personal": null,
+      "metaScore": 0.3,
+      "firstPickScore": null,
+      "tournamentTier": "C",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": 0.59,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Floryn",
+      "name": "Floryn",
+      "roles": [
+        "ROAM"
+      ],
+      "winRate": 54.07,
+      "pickRate": 1.0,
+      "banRate": 12.97,
+      "roleWinRate": {
+        "ROAM": 54.07
+      },
+      "personal": null,
+      "metaScore": 1.7,
+      "firstPickScore": null,
+      "tournamentTier": "SS",
+      "laneRankScore": {
+        "ROAM": 1.74
+      },
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": 0.17
+    },
+    {
+      "id": "Carmilla",
+      "name": "Carmilla",
+      "roles": [
+        "ROAM"
+      ],
+      "winRate": 53.83,
+      "pickRate": 1.15,
+      "banRate": 12.47,
+      "roleWinRate": {
+        "ROAM": 53.83
+      },
+      "personal": null,
+      "metaScore": 1.5,
+      "firstPickScore": null,
+      "tournamentTier": "C",
+      "laneRankScore": {
+        "ROAM": 1.45
+      },
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": 0.31,
+      "counterScore": null
+    },
+    {
+      "id": "Valir",
+      "name": "Valir",
+      "roles": [
+        "MID"
+      ],
+      "winRate": 53.56,
+      "pickRate": 0.98,
+      "banRate": 1.86,
+      "roleWinRate": {
+        "MID": 53.56
+      },
+      "personal": null,
+      "metaScore": 1.1,
+      "firstPickScore": null,
+      "tournamentTier": "C",
+      "laneRankScore": {
+        "MID": 1.13
+      },
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Obsidia",
+      "name": "Obsidia",
+      "roles": [
+        "GOLD"
+      ],
+      "winRate": 53.37,
+      "pickRate": 1.97,
+      "banRate": 9.48,
+      "roleWinRate": {
+        "GOLD": 53.37
+      },
+      "personal": null,
+      "metaScore": 1.7,
+      "firstPickScore": 2.72,
+      "tournamentTier": "C",
+      "laneRankScore": {
+        "GOLD": 1.68
+      },
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Diggie",
+      "name": "Diggie",
+      "roles": [
+        "ROAM"
+      ],
+      "winRate": 53.31,
+      "pickRate": 0.18,
+      "banRate": 3.37,
+      "roleWinRate": {
+        "ROAM": 53.31
+      },
+      "personal": null,
+      "metaScore": 0.7,
+      "firstPickScore": null,
+      "tournamentTier": "S",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Hirara",
+      "name": "Hirara",
+      "roles": [
+        "JUNGLE"
+      ],
+      "winRate": 53.3,
+      "pickRate": 0.62,
+      "banRate": 66.48,
+      "roleWinRate": {
+        "JUNGLE": 53.3
+      },
+      "personal": null,
+      "metaScore": 1.3,
+      "firstPickScore": null,
+      "tournamentTier": "SS",
+      "laneRankScore": {
+        "JUNGLE": 1.33
+      },
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Bruno",
+      "name": "Bruno",
+      "roles": [
+        "GOLD"
+      ],
+      "winRate": 53.15,
+      "pickRate": 0.5,
+      "banRate": 0.32,
+      "roleWinRate": {
+        "GOLD": 53.15
+      },
+      "personal": null,
+      "metaScore": 1.1,
+      "firstPickScore": null,
+      "tournamentTier": "D",
+      "laneRankScore": {
+        "GOLD": 1.06
+      },
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Lukas",
+      "name": "Lukas",
+      "roles": [
+        "EXP",
+        "JUNGLE"
+      ],
+      "winRate": 52.96,
+      "pickRate": 0.99,
+      "banRate": 29.31,
+      "roleWinRate": {
+        "EXP": 52.96,
+        "JUNGLE": 52.96
+      },
+      "personal": null,
+      "metaScore": 1.3,
+      "firstPickScore": null,
+      "tournamentTier": "B",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Gord",
+      "name": "Gord",
+      "roles": [
+        "MID"
+      ],
+      "winRate": 52.95,
+      "pickRate": 0.66,
+      "banRate": 0.59,
+      "roleWinRate": {
+        "MID": 52.95
+      },
+      "personal": null,
+      "metaScore": 1.0,
+      "firstPickScore": null,
+      "tournamentTier": "A",
+      "laneRankScore": {
+        "MID": 0.96
+      },
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Estes",
+      "name": "Estes",
+      "roles": [
+        "ROAM"
+      ],
+      "winRate": 52.89,
+      "pickRate": 0.71,
+      "banRate": 38.17,
+      "roleWinRate": {
+        "ROAM": 52.89
+      },
+      "personal": null,
+      "metaScore": 1.1,
+      "firstPickScore": null,
+      "tournamentTier": "S",
+      "laneRankScore": {
+        "ROAM": 1.11
+      },
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Edith",
+      "name": "Edith",
+      "roles": [
+        "EXP",
+        "ROAM"
+      ],
+      "winRate": 52.7,
+      "pickRate": 0.35,
+      "banRate": 0.22,
+      "roleWinRate": {
+        "EXP": 52.7,
+        "ROAM": 52.7
+      },
+      "personal": null,
+      "metaScore": 0.7,
+      "firstPickScore": null,
+      "tournamentTier": "D",
+      "laneRankScore": {
+        "EXP": 0.68
+      },
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Ling",
+      "name": "Ling",
+      "roles": [
+        "JUNGLE"
+      ],
+      "winRate": 52.54,
+      "pickRate": 0.73,
+      "banRate": 0.85,
+      "roleWinRate": {
+        "JUNGLE": 52.54
+      },
+      "personal": null,
+      "metaScore": 1.0,
+      "firstPickScore": null,
+      "tournamentTier": "B",
+      "laneRankScore": {
+        "JUNGLE": 0.99
+      },
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Benedetta",
+      "name": "Benedetta",
+      "roles": [
+        "EXP"
+      ],
+      "winRate": 52.42,
+      "pickRate": 0.37,
+      "banRate": 0.29,
+      "roleWinRate": {
+        "EXP": 52.42
+      },
+      "personal": null,
+      "metaScore": 0.7,
+      "firstPickScore": null,
+      "tournamentTier": "C",
+      "laneRankScore": {
+        "EXP": 0.71
+      },
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Yve",
+      "name": "Yve",
+      "roles": [
+        "MID"
+      ],
+      "winRate": 52.36,
+      "pickRate": 0.05,
+      "banRate": 0.04,
+      "roleWinRate": {
+        "MID": 52.36
+      },
+      "personal": null,
+      "metaScore": 0,
+      "firstPickScore": null,
+      "tournamentTier": "C",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": 0.24
+    },
+    {
+      "id": "Sun",
+      "name": "Sun",
+      "roles": [
+        "EXP",
+        "JUNGLE"
+      ],
+      "winRate": 52.32,
+      "pickRate": 1.58,
+      "banRate": 18.78,
+      "roleWinRate": {
+        "EXP": 52.32,
+        "JUNGLE": 52.32
+      },
+      "personal": null,
+      "metaScore": 1.0,
+      "firstPickScore": null,
+      "tournamentTier": "S",
+      "laneRankScore": {
+        "EXP": 0.99,
+        "JUNGLE": 0.99
+      },
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": 0.26,
+      "counterScore": null
+    },
+    {
+      "id": "Zhask",
+      "name": "Zhask",
+      "roles": [
+        "MID"
+      ],
+      "winRate": 52.19,
+      "pickRate": 0.36,
+      "banRate": 0.35,
+      "roleWinRate": {
+        "MID": 52.19
+      },
+      "personal": null,
+      "metaScore": 0.5,
+      "firstPickScore": null,
+      "tournamentTier": "D",
+      "laneRankScore": {
+        "MID": 0.54
+      },
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Belerick",
+      "name": "Belerick",
+      "roles": [
+        "ROAM"
+      ],
+      "winRate": 52.17,
+      "pickRate": 1.78,
+      "banRate": 56.2,
+      "roleWinRate": {
+        "ROAM": 52.17
+      },
+      "personal": null,
+      "metaScore": 1.1,
+      "firstPickScore": null,
+      "tournamentTier": "S",
+      "laneRankScore": {
+        "ROAM": 1.09
+      },
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Irithel",
+      "name": "Irithel",
+      "roles": [
+        "GOLD"
+      ],
+      "winRate": 52.14,
+      "pickRate": 0.42,
+      "banRate": 0.22,
+      "roleWinRate": {
+        "GOLD": 52.14
+      },
+      "personal": null,
+      "metaScore": 0.6,
+      "firstPickScore": null,
+      "tournamentTier": "C",
+      "laneRankScore": {
+        "GOLD": 0.65
+      },
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Kagura",
+      "name": "Kagura",
+      "roles": [
+        "MID"
+      ],
+      "winRate": 52.13,
+      "pickRate": 0.64,
+      "banRate": 1.16,
+      "roleWinRate": {
+        "MID": 52.13
+      },
+      "personal": null,
+      "metaScore": 0.8,
+      "firstPickScore": null,
+      "tournamentTier": "C",
+      "laneRankScore": {
+        "MID": 0.79
+      },
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Hanabi",
+      "name": "Hanabi",
+      "roles": [
+        "GOLD"
+      ],
+      "winRate": 51.88,
+      "pickRate": 2.8,
+      "banRate": 5.8,
+      "roleWinRate": {
+        "GOLD": 51.88
+      },
+      "personal": null,
+      "metaScore": 0.9,
+      "firstPickScore": null,
+      "tournamentTier": "B",
+      "laneRankScore": {
+        "GOLD": 0.89
+      },
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Barats",
+      "name": "Barats",
+      "roles": [
+        "EXP",
+        "JUNGLE"
+      ],
+      "winRate": 51.85,
+      "pickRate": 0.79,
+      "banRate": 4.9,
+      "roleWinRate": {
+        "EXP": 51.85,
+        "JUNGLE": 51.85
+      },
+      "personal": null,
+      "metaScore": 0.6,
+      "firstPickScore": null,
+      "tournamentTier": "D",
+      "laneRankScore": {
+        "JUNGLE": 0.63
+      },
+      "sourceBestVsRate": 0.59,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Atlas",
+      "name": "Atlas",
+      "roles": [
+        "ROAM"
+      ],
+      "winRate": 51.82,
+      "pickRate": 1.0,
+      "banRate": 12.54,
+      "roleWinRate": {
+        "ROAM": 51.82
+      },
+      "personal": null,
+      "metaScore": 0.8,
+      "firstPickScore": null,
+      "tournamentTier": "S",
+      "laneRankScore": {
+        "ROAM": 0.76
+      },
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": 0.28,
+      "counterScore": null
+    },
+    {
+      "id": "Kadita",
+      "name": "Kadita",
+      "roles": [
+        "MID"
+      ],
+      "winRate": 51.59,
+      "pickRate": 0.92,
+      "banRate": 4.39,
+      "roleWinRate": {
+        "MID": 51.59
+      },
+      "personal": null,
+      "metaScore": 0.6,
+      "firstPickScore": 3.4,
+      "tournamentTier": "A",
+      "laneRankScore": {
+        "MID": 0.57
+      },
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Faramis",
+      "name": "Faramis",
+      "roles": [
+        "MID",
+        "ROAM"
+      ],
+      "winRate": 51.53,
+      "pickRate": 0.08,
+      "banRate": 0.26,
+      "roleWinRate": {
+        "MID": 51.53,
+        "ROAM": 51.53
+      },
+      "personal": null,
+      "metaScore": 0.1,
+      "firstPickScore": null,
+      "tournamentTier": "C",
+      "laneRankScore": {
+        "MID": 0.12
+      },
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Beatrix",
+      "name": "Beatrix",
+      "roles": [
+        "GOLD"
+      ],
+      "winRate": 51.41,
+      "pickRate": 0.69,
+      "banRate": 0.42,
+      "roleWinRate": {
+        "GOLD": 51.41
+      },
+      "personal": null,
+      "metaScore": 0.6,
+      "firstPickScore": null,
+      "tournamentTier": "A",
+      "laneRankScore": {
+        "GOLD": 0.58
+      },
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Guinevere",
+      "name": "Guinevere",
+      "roles": [
+        "EXP"
+      ],
+      "winRate": 51.35,
+      "pickRate": 0.87,
+      "banRate": 2.71,
+      "roleWinRate": {
+        "EXP": 51.35
+      },
+      "personal": null,
+      "metaScore": 0.5,
+      "firstPickScore": null,
+      "tournamentTier": "S",
+      "laneRankScore": {
+        "EXP": 0.51
+      },
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Natan",
+      "name": "Natan",
+      "roles": [
+        "GOLD"
+      ],
+      "winRate": 51.21,
+      "pickRate": 0.29,
+      "banRate": 0.12,
+      "roleWinRate": {
+        "GOLD": 51.21
+      },
+      "personal": null,
+      "metaScore": 0.3,
+      "firstPickScore": null,
+      "tournamentTier": "D",
+      "laneRankScore": {
+        "GOLD": 0.29
+      },
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Cecilion",
+      "name": "Cecilion",
+      "roles": [
+        "MID"
+      ],
+      "winRate": 51.16,
+      "pickRate": 0.66,
+      "banRate": 0.13,
+      "roleWinRate": {
+        "MID": 51.16
+      },
+      "personal": null,
+      "metaScore": 0.3,
+      "firstPickScore": 3.18,
+      "tournamentTier": "D",
+      "laneRankScore": {
+        "MID": 0.3
+      },
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Cyclops",
+      "name": "Cyclops",
+      "roles": [
+        "MID"
+      ],
+      "winRate": 51.15,
+      "pickRate": 0.63,
+      "banRate": 0.24,
+      "roleWinRate": {
+        "MID": 51.15
+      },
+      "personal": null,
+      "metaScore": 0.3,
+      "firstPickScore": null,
+      "tournamentTier": "D",
+      "laneRankScore": {
+        "MID": 0.35
+      },
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Eudora",
+      "name": "Eudora",
+      "roles": [
+        "MID"
+      ],
+      "winRate": 51.12,
+      "pickRate": 1.96,
+      "banRate": 59.53,
+      "roleWinRate": {
+        "MID": 51.12
+      },
+      "personal": null,
+      "metaScore": 0.6,
+      "firstPickScore": null,
+      "tournamentTier": "C",
+      "laneRankScore": {
+        "MID": 0.58
+      },
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Minsitthar",
+      "name": "Minsitthar",
+      "roles": [
+        "EXP",
+        "ROAM"
+      ],
+      "winRate": 51.08,
+      "pickRate": 0.65,
+      "banRate": 5.13,
+      "roleWinRate": {
+        "EXP": 51.08,
+        "ROAM": 51.08
+      },
+      "personal": null,
+      "metaScore": 0.3,
+      "firstPickScore": null,
+      "tournamentTier": "A",
+      "laneRankScore": {
+        "EXP": 0.31
+      },
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Clint",
+      "name": "Clint",
+      "roles": [
+        "GOLD"
+      ],
+      "winRate": 50.97,
+      "pickRate": 0.79,
+      "banRate": 0.82,
+      "roleWinRate": {
+        "GOLD": 50.97
+      },
+      "personal": null,
+      "metaScore": 0.5,
+      "firstPickScore": 2.92,
+      "tournamentTier": "C",
+      "laneRankScore": {
+        "GOLD": 0.48
+      },
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Bane",
+      "name": "Bane",
+      "roles": [
+        "JUNGLE",
+        "EXP"
+      ],
+      "winRate": 50.9,
+      "pickRate": 0.26,
+      "banRate": 0.15,
+      "roleWinRate": {
+        "JUNGLE": 50.9,
+        "EXP": 50.9
+      },
+      "personal": null,
+      "metaScore": 0.2,
+      "firstPickScore": null,
+      "tournamentTier": "D",
+      "laneRankScore": {
+        "JUNGLE": 0.2
+      },
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Fredrinn",
+      "name": "Fredrinn",
+      "roles": [
+        "JUNGLE"
+      ],
+      "winRate": 50.89,
+      "pickRate": 0.51,
+      "banRate": 1.79,
+      "roleWinRate": {
+        "JUNGLE": 50.89
+      },
+      "personal": null,
+      "metaScore": 0.4,
+      "firstPickScore": null,
+      "tournamentTier": "S",
+      "laneRankScore": {
+        "JUNGLE": 0.42
+      },
+      "sourceBestVsRate": 0.59,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Natalia",
+      "name": "Natalia",
+      "roles": [
+        "JUNGLE",
+        "ROAM"
+      ],
+      "winRate": 50.87,
+      "pickRate": 0.28,
+      "banRate": 1.32,
+      "roleWinRate": {
+        "JUNGLE": 50.87,
+        "ROAM": 50.87
+      },
+      "personal": null,
+      "metaScore": 0.2,
+      "firstPickScore": null,
+      "tournamentTier": "C",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": 0.37,
+      "counterScore": null
+    },
+    {
+      "id": "Khaleed",
+      "name": "Khaleed",
+      "roles": [
+        "EXP"
+      ],
+      "winRate": 50.83,
+      "pickRate": 0.12,
+      "banRate": 0.07,
+      "roleWinRate": {
+        "EXP": 50.83
+      },
+      "personal": null,
+      "metaScore": 0.1,
+      "firstPickScore": null,
+      "tournamentTier": "D",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Silvanna",
+      "name": "Silvanna",
+      "roles": [
+        "EXP"
+      ],
+      "winRate": 50.76,
+      "pickRate": 1.01,
+      "banRate": 1.51,
+      "roleWinRate": {
+        "EXP": 50.76
+      },
+      "personal": null,
+      "metaScore": 0.2,
+      "firstPickScore": null,
+      "tournamentTier": "C",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Alice",
+      "name": "Alice",
+      "roles": [
+        "EXP",
+        "JUNGLE"
+      ],
+      "winRate": 50.71,
+      "pickRate": 0.79,
+      "banRate": 4.58,
+      "roleWinRate": {
+        "EXP": 50.71,
+        "JUNGLE": 50.71
+      },
+      "personal": null,
+      "metaScore": 0.2,
+      "firstPickScore": null,
+      "tournamentTier": "B",
+      "laneRankScore": {
+        "EXP": 0.22,
+        "JUNGLE": 0.22
+      },
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Zetian",
+      "name": "Zetian",
+      "roles": [
+        "MID"
+      ],
+      "winRate": 50.68,
+      "pickRate": 1.57,
+      "banRate": 3.83,
+      "roleWinRate": {
+        "MID": 50.68
+      },
+      "personal": null,
+      "metaScore": 0.4,
+      "firstPickScore": 3.13,
+      "tournamentTier": "A",
+      "laneRankScore": {
+        "MID": 0.44
+      },
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Terizla",
+      "name": "Terizla",
+      "roles": [
+        "EXP"
+      ],
+      "winRate": 50.56,
+      "pickRate": 0.34,
+      "banRate": 0.16,
+      "roleWinRate": {
+        "EXP": 50.56
+      },
+      "personal": null,
+      "metaScore": 0.2,
+      "firstPickScore": null,
+      "tournamentTier": "D",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Aldous",
+      "name": "Aldous",
+      "roles": [
+        "EXP"
+      ],
+      "winRate": 50.54,
+      "pickRate": 0.47,
+      "banRate": 0.6,
+      "roleWinRate": {
+        "EXP": 50.54
+      },
+      "personal": null,
+      "metaScore": 0.3,
+      "firstPickScore": null,
+      "tournamentTier": "D",
+      "laneRankScore": {
+        "EXP": 0.25
+      },
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Brody",
+      "name": "Brody",
+      "roles": [
+        "GOLD"
+      ],
+      "winRate": 50.52,
+      "pickRate": 1.07,
+      "banRate": 2.46,
+      "roleWinRate": {
+        "GOLD": 50.52
+      },
+      "personal": null,
+      "metaScore": 0.2,
+      "firstPickScore": null,
+      "tournamentTier": "C",
+      "laneRankScore": {
+        "GOLD": 0.18
+      },
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Moskov",
+      "name": "Moskov",
+      "roles": [
+        "GOLD"
+      ],
+      "winRate": 50.52,
+      "pickRate": 0.92,
+      "banRate": 0.25,
+      "roleWinRate": {
+        "GOLD": 50.52
+      },
+      "personal": null,
+      "metaScore": 0.2,
+      "firstPickScore": null,
+      "tournamentTier": "C",
+      "laneRankScore": {
+        "GOLD": 0.23
+      },
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Zhuxin",
+      "name": "Zhuxin",
+      "roles": [
+        "MID"
+      ],
+      "winRate": 50.37,
+      "pickRate": 0.16,
+      "banRate": 0.27,
+      "roleWinRate": {
+        "MID": 50.37
+      },
+      "personal": null,
+      "metaScore": 0,
+      "firstPickScore": null,
+      "tournamentTier": "S",
+      "laneRankScore": {},
+      "sourceBestVsRate": 0.63,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": 0.22
+    },
+    {
+      "id": "Hilda",
+      "name": "Hilda",
+      "roles": [
+        "ROAM",
+        "EXP"
+      ],
+      "winRate": 50.23,
+      "pickRate": 0.6,
+      "banRate": 6.59,
+      "roleWinRate": {
+        "ROAM": 50.23,
+        "EXP": 50.23
+      },
+      "personal": null,
+      "metaScore": 0.1,
+      "firstPickScore": null,
+      "tournamentTier": "B",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Leomord",
+      "name": "Leomord",
+      "roles": [
+        "JUNGLE"
+      ],
+      "winRate": 50.23,
+      "pickRate": 0.3,
+      "banRate": 0.44,
+      "roleWinRate": {
+        "JUNGLE": 50.23
+      },
+      "personal": null,
+      "metaScore": 0.1,
+      "firstPickScore": null,
+      "tournamentTier": "C",
+      "laneRankScore": {
+        "JUNGLE": 0.11
+      },
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Paquito",
+      "name": "Paquito",
+      "roles": [
+        "EXP"
+      ],
+      "winRate": 50.19,
+      "pickRate": 1.7,
+      "banRate": 44.14,
+      "roleWinRate": {
+        "EXP": 50.19
+      },
+      "personal": null,
+      "metaScore": 0.2,
+      "firstPickScore": 3.08,
+      "tournamentTier": "SS",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Akai",
+      "name": "Akai",
+      "roles": [
+        "ROAM"
+      ],
+      "winRate": 50.14,
+      "pickRate": 0.36,
+      "banRate": 1.29,
+      "roleWinRate": {
+        "ROAM": 50.14
+      },
+      "personal": null,
+      "metaScore": 0,
+      "firstPickScore": null,
+      "tournamentTier": "SS",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Badang",
+      "name": "Badang",
+      "roles": [
+        "EXP",
+        "ROAM"
+      ],
+      "winRate": 50.13,
+      "pickRate": 1.58,
+      "banRate": 6.18,
+      "roleWinRate": {
+        "EXP": 50.13,
+        "ROAM": 50.13
+      },
+      "personal": null,
+      "metaScore": 0.1,
+      "firstPickScore": null,
+      "tournamentTier": "C",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": 0.3,
+      "counterScore": null
+    },
+    {
+      "id": "Vale",
+      "name": "Vale",
+      "roles": [
+        "MID"
+      ],
+      "winRate": 50.11,
+      "pickRate": 0.52,
+      "banRate": 0.18,
+      "roleWinRate": {
+        "MID": 50.11
+      },
+      "personal": null,
+      "metaScore": -0.1,
+      "firstPickScore": null,
+      "tournamentTier": "D",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": 0.66,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Julian",
+      "name": "Julian",
+      "roles": [
+        "JUNGLE",
+        "EXP"
+      ],
+      "winRate": 49.92,
+      "pickRate": 0.73,
+      "banRate": 0.85,
+      "roleWinRate": {
+        "JUNGLE": 49.92,
+        "EXP": 49.92
+      },
+      "personal": null,
+      "metaScore": 0,
+      "firstPickScore": 2.65,
+      "tournamentTier": "D",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Sora",
+      "name": "Sora",
+      "roles": [
+        "EXP"
+      ],
+      "winRate": 49.88,
+      "pickRate": 0.56,
+      "banRate": 2.83,
+      "roleWinRate": {
+        "EXP": 49.88
+      },
+      "personal": null,
+      "metaScore": -0.1,
+      "firstPickScore": null,
+      "tournamentTier": "A",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Yi Sun-shin",
+      "name": "Yi Sun-shin",
+      "roles": [
+        "JUNGLE"
+      ],
+      "winRate": 49.86,
+      "pickRate": 1.44,
+      "banRate": 8.0,
+      "roleWinRate": {
+        "JUNGLE": 49.86
+      },
+      "personal": null,
+      "metaScore": 0.1,
+      "firstPickScore": 3.33,
+      "tournamentTier": "A",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Uranus",
+      "name": "Uranus",
+      "roles": [
+        "EXP"
+      ],
+      "winRate": 49.85,
+      "pickRate": 0.35,
+      "banRate": 0.34,
+      "roleWinRate": {
+        "EXP": 49.85
+      },
+      "personal": null,
+      "metaScore": -0.1,
+      "firstPickScore": null,
+      "tournamentTier": "C",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Ixia",
+      "name": "Ixia",
+      "roles": [
+        "GOLD"
+      ],
+      "winRate": 49.77,
+      "pickRate": 0.77,
+      "banRate": 0.71,
+      "roleWinRate": {
+        "GOLD": 49.77
+      },
+      "personal": null,
+      "metaScore": -0.1,
+      "firstPickScore": null,
+      "tournamentTier": "C",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Novaria",
+      "name": "Novaria",
+      "roles": [
+        "MID"
+      ],
+      "winRate": 49.75,
+      "pickRate": 1.52,
+      "banRate": 4.37,
+      "roleWinRate": {
+        "MID": 49.75
+      },
+      "personal": null,
+      "metaScore": 0.1,
+      "firstPickScore": null,
+      "tournamentTier": "D",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Xavier",
+      "name": "Xavier",
+      "roles": [
+        "MID"
+      ],
+      "winRate": 49.72,
+      "pickRate": 0.53,
+      "banRate": 0.11,
+      "roleWinRate": {
+        "MID": 49.72
+      },
+      "personal": null,
+      "metaScore": 0,
+      "firstPickScore": null,
+      "tournamentTier": "D",
+      "laneRankScore": {},
+      "sourceBestVsRate": 0.59,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "X.Borg",
+      "name": "X.Borg",
+      "roles": [
+        "EXP"
+      ],
+      "winRate": 49.71,
+      "pickRate": 0.59,
+      "banRate": 1.66,
+      "roleWinRate": {
+        "EXP": 49.71
+      },
+      "personal": null,
+      "metaScore": -0.1,
+      "firstPickScore": -3.04,
+      "tournamentTier": "D",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": 0.25,
+      "counterScore": null
+    },
+    {
+      "id": "Suyou",
+      "name": "Suyou",
+      "roles": [
+        "JUNGLE"
+      ],
+      "winRate": 49.57,
+      "pickRate": 0.8,
+      "banRate": 0.94,
+      "roleWinRate": {
+        "JUNGLE": 49.57
+      },
+      "personal": null,
+      "metaScore": -0.1,
+      "firstPickScore": 2.57,
+      "tournamentTier": "B",
+      "laneRankScore": {},
+      "sourceBestVsRate": 0.58,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Odette",
+      "name": "Odette",
+      "roles": [
+        "MID"
+      ],
+      "winRate": 49.56,
+      "pickRate": 0.62,
+      "banRate": 0.4,
+      "roleWinRate": {
+        "MID": 49.56
+      },
+      "personal": null,
+      "metaScore": -0.2,
+      "firstPickScore": null,
+      "tournamentTier": "C",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Lylia",
+      "name": "Lylia",
+      "roles": [
+        "MID"
+      ],
+      "winRate": 49.44,
+      "pickRate": 0.46,
+      "banRate": 0.32,
+      "roleWinRate": {
+        "MID": 49.44
+      },
+      "personal": null,
+      "metaScore": -0.1,
+      "firstPickScore": null,
+      "tournamentTier": "D",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Ruby",
+      "name": "Ruby",
+      "roles": [
+        "EXP"
+      ],
+      "winRate": 49.41,
+      "pickRate": 0.38,
+      "banRate": 0.25,
+      "roleWinRate": {
+        "EXP": 49.41
+      },
+      "personal": null,
+      "metaScore": -0.1,
+      "firstPickScore": null,
+      "tournamentTier": "C",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Miya",
+      "name": "Miya",
+      "roles": [
+        "GOLD"
+      ],
+      "winRate": 49.39,
+      "pickRate": 2.93,
+      "banRate": 8.13,
+      "roleWinRate": {
+        "GOLD": 49.39
+      },
+      "personal": null,
+      "metaScore": -0.4,
+      "firstPickScore": null,
+      "tournamentTier": "A",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Aamon",
+      "name": "Aamon",
+      "roles": [
+        "JUNGLE"
+      ],
+      "winRate": 49.38,
+      "pickRate": 0.69,
+      "banRate": 2.35,
+      "roleWinRate": {
+        "JUNGLE": 49.38
+      },
+      "personal": null,
+      "metaScore": -0.1,
+      "firstPickScore": null,
+      "tournamentTier": "C",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Kaja",
+      "name": "Kaja",
+      "roles": [
+        "ROAM"
+      ],
+      "winRate": 49.37,
+      "pickRate": 0.6,
+      "banRate": 20.59,
+      "roleWinRate": {
+        "ROAM": 49.37
+      },
+      "personal": null,
+      "metaScore": 0,
+      "firstPickScore": null,
+      "tournamentTier": "A",
+      "laneRankScore": {},
+      "sourceBestVsRate": 0.61,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": 0.15
+    },
+    {
+      "id": "Claude",
+      "name": "Claude",
+      "roles": [
+        "GOLD"
+      ],
+      "winRate": 49.33,
+      "pickRate": 0.73,
+      "banRate": 0.19,
+      "roleWinRate": {
+        "GOLD": 49.33
+      },
+      "personal": null,
+      "metaScore": -0.4,
+      "firstPickScore": null,
+      "tournamentTier": "C",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Saber",
+      "name": "Saber",
+      "roles": [
+        "JUNGLE",
+        "ROAM"
+      ],
+      "winRate": 49.25,
+      "pickRate": 1.01,
+      "banRate": 21.42,
+      "roleWinRate": {
+        "JUNGLE": 49.25,
+        "ROAM": 49.25
+      },
+      "personal": null,
+      "metaScore": -0.4,
+      "firstPickScore": null,
+      "tournamentTier": "B",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Vexana",
+      "name": "Vexana",
+      "roles": [
+        "MID"
+      ],
+      "winRate": 49.24,
+      "pickRate": 1.6,
+      "banRate": 1.11,
+      "roleWinRate": {
+        "MID": 49.24
+      },
+      "personal": null,
+      "metaScore": -0.4,
+      "firstPickScore": null,
+      "tournamentTier": "D",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": 0.59,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Hanzo",
+      "name": "Hanzo",
+      "roles": [
+        "JUNGLE"
+      ],
+      "winRate": 49.19,
+      "pickRate": 0.52,
+      "banRate": 17.22,
+      "roleWinRate": {
+        "JUNGLE": 49.19
+      },
+      "personal": null,
+      "metaScore": -0.1,
+      "firstPickScore": null,
+      "tournamentTier": "C",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Roger",
+      "name": "Roger",
+      "roles": [
+        "JUNGLE"
+      ],
+      "winRate": 49.18,
+      "pickRate": 0.32,
+      "banRate": 0.1,
+      "roleWinRate": {
+        "JUNGLE": 49.18
+      },
+      "personal": null,
+      "metaScore": -0.2,
+      "firstPickScore": null,
+      "tournamentTier": "D",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": 0.59,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Angela",
+      "name": "Angela",
+      "roles": [
+        "ROAM"
+      ],
+      "winRate": 49.13,
+      "pickRate": 1.75,
+      "banRate": 9.16,
+      "roleWinRate": {
+        "ROAM": 49.13
+      },
+      "personal": null,
+      "metaScore": -0.2,
+      "firstPickScore": null,
+      "tournamentTier": "A",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Selena",
+      "name": "Selena",
+      "roles": [
+        "MID",
+        "ROAM"
+      ],
+      "winRate": 49.05,
+      "pickRate": 1.36,
+      "banRate": 3.52,
+      "roleWinRate": {
+        "MID": 49.05,
+        "ROAM": 49.05
+      },
+      "personal": null,
+      "metaScore": -0.3,
+      "firstPickScore": null,
+      "tournamentTier": "B",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Nolan",
+      "name": "Nolan",
+      "roles": [
+        "JUNGLE"
+      ],
+      "winRate": 48.96,
+      "pickRate": 0.96,
+      "banRate": 2.65,
+      "roleWinRate": {
+        "JUNGLE": 48.96
+      },
+      "personal": null,
+      "metaScore": -0.3,
+      "firstPickScore": null,
+      "tournamentTier": "D",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Cici",
+      "name": "Cici",
+      "roles": [
+        "EXP"
+      ],
+      "winRate": 48.95,
+      "pickRate": 0.48,
+      "banRate": 0.86,
+      "roleWinRate": {
+        "EXP": 48.95
+      },
+      "personal": null,
+      "metaScore": -0.2,
+      "firstPickScore": null,
+      "tournamentTier": "D",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Yu Zhong",
+      "name": "Yu Zhong",
+      "roles": [
+        "EXP"
+      ],
+      "winRate": 48.91,
+      "pickRate": 0.57,
+      "banRate": 0.63,
+      "roleWinRate": {
+        "EXP": 48.91
+      },
+      "personal": null,
+      "metaScore": -0.2,
+      "firstPickScore": null,
+      "tournamentTier": "C",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Kimmy",
+      "name": "Kimmy",
+      "roles": [
+        "MID",
+        "GOLD"
+      ],
+      "winRate": 48.85,
+      "pickRate": 0.6,
+      "banRate": 0.27,
+      "roleWinRate": {
+        "MID": 48.85,
+        "GOLD": 48.85
+      },
+      "personal": null,
+      "metaScore": -0.4,
+      "firstPickScore": null,
+      "tournamentTier": "C",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Lunox",
+      "name": "Lunox",
+      "roles": [
+        "MID"
+      ],
+      "winRate": 48.83,
+      "pickRate": 0.23,
+      "banRate": 0.15,
+      "roleWinRate": {
+        "MID": 48.83
+      },
+      "personal": null,
+      "metaScore": -0.2,
+      "firstPickScore": null,
+      "tournamentTier": "D",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": 0.21
+    },
+    {
+      "id": "Joy",
+      "name": "Joy",
+      "roles": [
+        "JUNGLE"
+      ],
+      "winRate": 48.67,
+      "pickRate": 0.15,
+      "banRate": 0.18,
+      "roleWinRate": {
+        "JUNGLE": 48.67
+      },
+      "personal": null,
+      "metaScore": -0.1,
+      "firstPickScore": null,
+      "tournamentTier": "C",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Layla",
+      "name": "Layla",
+      "roles": [
+        "GOLD"
+      ],
+      "winRate": 48.63,
+      "pickRate": 1.13,
+      "banRate": 0.84,
+      "roleWinRate": {
+        "GOLD": 48.63
+      },
+      "personal": null,
+      "metaScore": -0.5,
+      "firstPickScore": null,
+      "tournamentTier": "D",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Wanwan",
+      "name": "Wanwan",
+      "roles": [
+        "GOLD"
+      ],
+      "winRate": 48.63,
+      "pickRate": 0.13,
+      "banRate": 0.1,
+      "roleWinRate": {
+        "GOLD": 48.63
+      },
+      "personal": null,
+      "metaScore": -0.2,
+      "firstPickScore": null,
+      "tournamentTier": "D",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Lapu-Lapu",
+      "name": "Lapu-Lapu",
+      "roles": [
+        "EXP"
+      ],
+      "winRate": 48.54,
+      "pickRate": 0.35,
+      "banRate": 0.26,
+      "roleWinRate": {
+        "EXP": 48.54
+      },
+      "personal": null,
+      "metaScore": -0.3,
+      "firstPickScore": null,
+      "tournamentTier": "D",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Gusion",
+      "name": "Gusion",
+      "roles": [
+        "JUNGLE",
+        "MID"
+      ],
+      "winRate": 48.4,
+      "pickRate": 1.37,
+      "banRate": 4.61,
+      "roleWinRate": {
+        "JUNGLE": 48.4,
+        "MID": 48.4
+      },
+      "personal": null,
+      "metaScore": -0.7,
+      "firstPickScore": null,
+      "tournamentTier": "B",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Yin",
+      "name": "Yin",
+      "roles": [
+        "JUNGLE",
+        "EXP"
+      ],
+      "winRate": 48.35,
+      "pickRate": 0.49,
+      "banRate": 1.6,
+      "roleWinRate": {
+        "JUNGLE": 48.35,
+        "EXP": 48.35
+      },
+      "personal": null,
+      "metaScore": -0.5,
+      "firstPickScore": null,
+      "tournamentTier": "C",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Alucard",
+      "name": "Alucard",
+      "roles": [
+        "JUNGLE"
+      ],
+      "winRate": 48.34,
+      "pickRate": 0.48,
+      "banRate": 0.27,
+      "roleWinRate": {
+        "JUNGLE": 48.34
+      },
+      "personal": null,
+      "metaScore": -0.5,
+      "firstPickScore": null,
+      "tournamentTier": "D",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Karrie",
+      "name": "Karrie",
+      "roles": [
+        "GOLD"
+      ],
+      "winRate": 48.33,
+      "pickRate": 0.57,
+      "banRate": 0.87,
+      "roleWinRate": {
+        "GOLD": 48.33
+      },
+      "personal": null,
+      "metaScore": -0.4,
+      "firstPickScore": null,
+      "tournamentTier": "B",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": 0.58,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Aurora",
+      "name": "Aurora",
+      "roles": [
+        "MID"
+      ],
+      "winRate": 48.3,
+      "pickRate": 0.6,
+      "banRate": 0.35,
+      "roleWinRate": {
+        "MID": 48.3
+      },
+      "personal": null,
+      "metaScore": -0.5,
+      "firstPickScore": null,
+      "tournamentTier": "D",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": 0.58,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Hylos",
+      "name": "Hylos",
+      "roles": [
+        "ROAM"
+      ],
+      "winRate": 48.29,
+      "pickRate": 0.3,
+      "banRate": 0.23,
+      "roleWinRate": {
+        "ROAM": 48.29
+      },
+      "personal": null,
+      "metaScore": -0.4,
+      "firstPickScore": null,
+      "tournamentTier": "D",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Thamuz",
+      "name": "Thamuz",
+      "roles": [
+        "EXP"
+      ],
+      "winRate": 48.28,
+      "pickRate": 0.82,
+      "banRate": 1.4,
+      "roleWinRate": {
+        "EXP": 48.28
+      },
+      "personal": null,
+      "metaScore": -0.6,
+      "firstPickScore": null,
+      "tournamentTier": "C",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Johnson",
+      "name": "Johnson",
+      "roles": [
+        "ROAM"
+      ],
+      "winRate": 48.2,
+      "pickRate": 0.8,
+      "banRate": 2.02,
+      "roleWinRate": {
+        "ROAM": 48.2
+      },
+      "personal": null,
+      "metaScore": -0.8,
+      "firstPickScore": -3.01,
+      "tournamentTier": "D",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": 0.59,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Hayabusa",
+      "name": "Hayabusa",
+      "roles": [
+        "JUNGLE"
+      ],
+      "winRate": 48.15,
+      "pickRate": 0.75,
+      "banRate": 1.87,
+      "roleWinRate": {
+        "JUNGLE": 48.15
+      },
+      "personal": null,
+      "metaScore": -0.6,
+      "firstPickScore": null,
+      "tournamentTier": "D",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Lesley",
+      "name": "Lesley",
+      "roles": [
+        "GOLD"
+      ],
+      "winRate": 48.13,
+      "pickRate": 1.84,
+      "banRate": 7.08,
+      "roleWinRate": {
+        "GOLD": 48.13
+      },
+      "personal": null,
+      "metaScore": -0.8,
+      "firstPickScore": null,
+      "tournamentTier": "A",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": 0.16
+    },
+    {
+      "id": "Melissa",
+      "name": "Melissa",
+      "roles": [
+        "GOLD"
+      ],
+      "winRate": 48.09,
+      "pickRate": 0.47,
+      "banRate": 1.93,
+      "roleWinRate": {
+        "GOLD": 48.09
+      },
+      "personal": null,
+      "metaScore": -0.4,
+      "firstPickScore": null,
+      "tournamentTier": "C",
+      "laneRankScore": {},
+      "sourceBestVsRate": 0.59,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": 0.17
+    },
+    {
+      "id": "Chang'e",
+      "name": "Chang'e",
+      "roles": [
+        "MID"
+      ],
+      "winRate": 48.0,
+      "pickRate": 0.71,
+      "banRate": 0.31,
+      "roleWinRate": {
+        "MID": 48.0
+      },
+      "personal": null,
+      "metaScore": -0.7,
+      "firstPickScore": null,
+      "tournamentTier": "D",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Arlott",
+      "name": "Arlott",
+      "roles": [
+        "EXP"
+      ],
+      "winRate": 47.92,
+      "pickRate": 0.38,
+      "banRate": 0.26,
+      "roleWinRate": {
+        "EXP": 47.92
+      },
+      "personal": null,
+      "metaScore": -0.5,
+      "firstPickScore": null,
+      "tournamentTier": "C",
+      "laneRankScore": {},
+      "sourceBestVsRate": 0.59,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Freya",
+      "name": "Freya",
+      "roles": [
+        "EXP",
+        "JUNGLE"
+      ],
+      "winRate": 47.91,
+      "pickRate": 0.53,
+      "banRate": 1.31,
+      "roleWinRate": {
+        "EXP": 47.91,
+        "JUNGLE": 47.91
+      },
+      "personal": null,
+      "metaScore": -0.7,
+      "firstPickScore": null,
+      "tournamentTier": "B",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": 0.27,
+      "counterScore": null
+    },
+    {
+      "id": "Alpha",
+      "name": "Alpha",
+      "roles": [
+        "JUNGLE",
+        "EXP"
+      ],
+      "winRate": 47.75,
+      "pickRate": 1.23,
+      "banRate": 0.63,
+      "roleWinRate": {
+        "JUNGLE": 47.75,
+        "EXP": 47.75
+      },
+      "personal": null,
+      "metaScore": -1,
+      "firstPickScore": -3.08,
+      "tournamentTier": "D",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": 0.59,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Luo Yi",
+      "name": "Luo Yi",
+      "roles": [
+        "MID"
+      ],
+      "winRate": 47.71,
+      "pickRate": 0.19,
+      "banRate": 0.09,
+      "roleWinRate": {
+        "MID": 47.71
+      },
+      "personal": null,
+      "metaScore": -0.4,
+      "firstPickScore": null,
+      "tournamentTier": "D",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Harley",
+      "name": "Harley",
+      "roles": [
+        "JUNGLE",
+        "MID"
+      ],
+      "winRate": 47.65,
+      "pickRate": 0.82,
+      "banRate": 3.73,
+      "roleWinRate": {
+        "JUNGLE": 47.65,
+        "MID": 47.65
+      },
+      "personal": null,
+      "metaScore": -0.8,
+      "firstPickScore": null,
+      "tournamentTier": "A",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Phoveus",
+      "name": "Phoveus",
+      "roles": [
+        "EXP"
+      ],
+      "winRate": 47.6,
+      "pickRate": 0.24,
+      "banRate": 0.47,
+      "roleWinRate": {
+        "EXP": 47.6
+      },
+      "personal": null,
+      "metaScore": -0.5,
+      "firstPickScore": -3.03,
+      "tournamentTier": "B",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Dyrroth",
+      "name": "Dyrroth",
+      "roles": [
+        "EXP",
+        "JUNGLE"
+      ],
+      "winRate": 47.46,
+      "pickRate": 1.6,
+      "banRate": 1.26,
+      "roleWinRate": {
+        "EXP": 47.46,
+        "JUNGLE": 47.46
+      },
+      "personal": null,
+      "metaScore": -1.2,
+      "firstPickScore": null,
+      "tournamentTier": "D",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Esmeralda",
+      "name": "Esmeralda",
+      "roles": [
+        "EXP"
+      ],
+      "winRate": 47.45,
+      "pickRate": 0.9,
+      "banRate": 2.11,
+      "roleWinRate": {
+        "EXP": 47.45
+      },
+      "personal": null,
+      "metaScore": -0.9,
+      "firstPickScore": -3.26,
+      "tournamentTier": "D",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Karina",
+      "name": "Karina",
+      "roles": [
+        "JUNGLE"
+      ],
+      "winRate": 47.27,
+      "pickRate": 0.83,
+      "banRate": 2.71,
+      "roleWinRate": {
+        "JUNGLE": 47.27
+      },
+      "personal": null,
+      "metaScore": -0.9,
+      "firstPickScore": -3.13,
+      "tournamentTier": "D",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Pharsa",
+      "name": "Pharsa",
+      "roles": [
+        "MID"
+      ],
+      "winRate": 47.2,
+      "pickRate": 0.35,
+      "banRate": 0.17,
+      "roleWinRate": {
+        "MID": 47.2
+      },
+      "personal": null,
+      "metaScore": -0.7,
+      "firstPickScore": null,
+      "tournamentTier": "D",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Jawhead",
+      "name": "Jawhead",
+      "roles": [
+        "EXP",
+        "ROAM"
+      ],
+      "winRate": 47.17,
+      "pickRate": 0.34,
+      "banRate": 0.25,
+      "roleWinRate": {
+        "EXP": 47.17,
+        "ROAM": 47.17
+      },
+      "personal": null,
+      "metaScore": -0.8,
+      "firstPickScore": null,
+      "tournamentTier": "D",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Helcurt",
+      "name": "Helcurt",
+      "roles": [
+        "JUNGLE",
+        "ROAM"
+      ],
+      "winRate": 47.04,
+      "pickRate": 0.58,
+      "banRate": 5.77,
+      "roleWinRate": {
+        "JUNGLE": 47.04,
+        "ROAM": 47.04
+      },
+      "personal": null,
+      "metaScore": -0.9,
+      "firstPickScore": null,
+      "tournamentTier": "S",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": 0.31,
+      "counterScore": null
+    },
+    {
+      "id": "Nana",
+      "name": "Nana",
+      "roles": [
+        "MID"
+      ],
+      "winRate": 47.04,
+      "pickRate": 2.18,
+      "banRate": 3.92,
+      "roleWinRate": {
+        "MID": 47.04
+      },
+      "personal": null,
+      "metaScore": -1.5,
+      "firstPickScore": null,
+      "tournamentTier": "D",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": 0.62,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Grock",
+      "name": "Grock",
+      "roles": [
+        "ROAM"
+      ],
+      "winRate": 47.03,
+      "pickRate": 0.34,
+      "banRate": 0.67,
+      "roleWinRate": {
+        "ROAM": 47.03
+      },
+      "personal": null,
+      "metaScore": -0.7,
+      "firstPickScore": null,
+      "tournamentTier": "C",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Harith",
+      "name": "Harith",
+      "roles": [
+        "GOLD"
+      ],
+      "winRate": 47.01,
+      "pickRate": 0.13,
+      "banRate": 0.05,
+      "roleWinRate": {
+        "GOLD": 47.01
+      },
+      "personal": null,
+      "metaScore": -0.4,
+      "firstPickScore": null,
+      "tournamentTier": "B",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": 0.26,
+      "counterScore": null
+    },
+    {
+      "id": "Chip",
+      "name": "Chip",
+      "roles": [
+        "ROAM"
+      ],
+      "winRate": 46.88,
+      "pickRate": 0.04,
+      "banRate": 0.24,
+      "roleWinRate": {
+        "ROAM": 46.88
+      },
+      "personal": null,
+      "metaScore": 0,
+      "firstPickScore": null,
+      "tournamentTier": "B",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Baxia",
+      "name": "Baxia",
+      "roles": [
+        "JUNGLE",
+        "ROAM"
+      ],
+      "winRate": 46.78,
+      "pickRate": 0.05,
+      "banRate": 0.09,
+      "roleWinRate": {
+        "JUNGLE": 46.78,
+        "ROAM": 46.78
+      },
+      "personal": null,
+      "metaScore": 0,
+      "firstPickScore": null,
+      "tournamentTier": "S",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Martis",
+      "name": "Martis",
+      "roles": [
+        "JUNGLE",
+        "EXP"
+      ],
+      "winRate": 46.68,
+      "pickRate": 0.57,
+      "banRate": 0.37,
+      "roleWinRate": {
+        "JUNGLE": 46.68,
+        "EXP": 46.68
+      },
+      "personal": null,
+      "metaScore": -1,
+      "firstPickScore": null,
+      "tournamentTier": "D",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Balmond",
+      "name": "Balmond",
+      "roles": [
+        "JUNGLE",
+        "EXP"
+      ],
+      "winRate": 46.12,
+      "pickRate": 0.69,
+      "banRate": 0.37,
+      "roleWinRate": {
+        "JUNGLE": 46.12,
+        "EXP": 46.12
+      },
+      "personal": null,
+      "metaScore": -1.4,
+      "firstPickScore": -3.12,
+      "tournamentTier": "C",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Valentina",
+      "name": "Valentina",
+      "roles": [
+        "MID"
+      ],
+      "winRate": 45.59,
+      "pickRate": 0.18,
+      "banRate": 0.16,
+      "roleWinRate": {
+        "MID": 45.59
+      },
+      "personal": null,
+      "metaScore": -0.7,
+      "firstPickScore": null,
+      "tournamentTier": "D",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Mathilda",
+      "name": "Mathilda",
+      "roles": [
+        "ROAM"
+      ],
+      "winRate": 45.36,
+      "pickRate": 0.14,
+      "banRate": 0.18,
+      "roleWinRate": {
+        "ROAM": 45.36
+      },
+      "personal": null,
+      "metaScore": -0.6,
+      "firstPickScore": null,
+      "tournamentTier": "B",
+      "laneRankScore": {},
+      "sourceBestVsRate": 0.6,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": 0.2
+    },
+    {
+      "id": "Zilong",
+      "name": "Zilong",
+      "roles": [
+        "EXP"
+      ],
+      "winRate": 45.33,
+      "pickRate": 0.65,
+      "banRate": 0.42,
+      "roleWinRate": {
+        "EXP": 45.33
+      },
+      "personal": null,
+      "metaScore": -1.6,
+      "firstPickScore": -3.03,
+      "tournamentTier": "D",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Chou",
+      "name": "Chou",
+      "roles": [
+        "EXP",
+        "ROAM"
+      ],
+      "winRate": 45.16,
+      "pickRate": 0.93,
+      "banRate": 3.17,
+      "roleWinRate": {
+        "EXP": 45.16,
+        "ROAM": 45.16
+      },
+      "personal": null,
+      "metaScore": -1.8,
+      "firstPickScore": null,
+      "tournamentTier": "C",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Gatotkaca",
+      "name": "Gatotkaca",
+      "roles": [
+        "ROAM",
+        "EXP"
+      ],
+      "winRate": 44.73,
+      "pickRate": 0.56,
+      "banRate": 0.27,
+      "roleWinRate": {
+        "ROAM": 44.73,
+        "EXP": 44.73
+      },
+      "personal": null,
+      "metaScore": -1.8,
+      "firstPickScore": null,
+      "tournamentTier": "D",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": 0.62,
+      "synergyScore": 0.24,
+      "counterScore": null
+    },
+    {
+      "id": "Kalea",
+      "name": "Kalea",
+      "roles": [
+        "ROAM"
+      ],
+      "winRate": 44.46,
+      "pickRate": 0.21,
+      "banRate": 0.34,
+      "roleWinRate": {
+        "ROAM": 44.46
+      },
+      "personal": null,
+      "metaScore": -0.9,
+      "firstPickScore": null,
+      "tournamentTier": "D",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Tigreal",
+      "name": "Tigreal",
+      "roles": [
+        "ROAM"
+      ],
+      "winRate": 44.23,
+      "pickRate": 1.84,
+      "banRate": 5.36,
+      "roleWinRate": {
+        "ROAM": 44.23
+      },
+      "personal": null,
+      "metaScore": -2.7,
+      "firstPickScore": -3.55,
+      "tournamentTier": "C",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Granger",
+      "name": "Granger",
+      "roles": [
+        "GOLD"
+      ],
+      "winRate": 43.48,
+      "pickRate": 1.25,
+      "banRate": 1.37,
+      "roleWinRate": {
+        "GOLD": 43.48
+      },
+      "personal": null,
+      "metaScore": -2.6,
+      "firstPickScore": -2.82,
+      "tournamentTier": "B",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Lancelot",
+      "name": "Lancelot",
+      "roles": [
+        "JUNGLE"
+      ],
+      "winRate": 43.24,
+      "pickRate": 0.47,
+      "banRate": 0.39,
+      "roleWinRate": {
+        "JUNGLE": 43.24
+      },
+      "personal": null,
+      "metaScore": -2,
+      "firstPickScore": null,
+      "tournamentTier": "D",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Fanny",
+      "name": "Fanny",
+      "roles": [
+        "JUNGLE"
+      ],
+      "winRate": 42.79,
+      "pickRate": 0.59,
+      "banRate": 1.68,
+      "roleWinRate": {
+        "JUNGLE": 42.79
+      },
+      "personal": null,
+      "metaScore": -2.3,
+      "firstPickScore": null,
+      "tournamentTier": "C",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    },
+    {
+      "id": "Franco",
+      "name": "Franco",
+      "roles": [
+        "ROAM"
+      ],
+      "winRate": 41.38,
+      "pickRate": 0.93,
+      "banRate": 3.05,
+      "roleWinRate": {
+        "ROAM": 41.38
+      },
+      "personal": null,
+      "metaScore": -3.1,
+      "firstPickScore": null,
+      "tournamentTier": "D",
+      "laneRankScore": {},
+      "sourceBestVsRate": null,
+      "sourceWorstVsRate": null,
+      "synergyScore": null,
+      "counterScore": null
+    }
+  ],
+  "matchups": [],
+  "synergies": [],
+  "laneRankings": {
+    "EXP": [
+      [
+        "Masha",
+        2.97
+      ],
+      [
+        "Argus",
+        1.74
+      ],
+      [
+        "Gloo",
+        1.36
+      ],
+      [
+        "Sun",
+        0.99
+      ],
+      [
+        "Benedetta",
+        0.71
+      ],
+      [
+        "Edith",
+        0.68
+      ],
+      [
+        "Guinevere",
+        0.51
+      ],
+      [
+        "Minsitthar",
+        0.31
+      ],
+      [
+        "Aldous",
+        0.25
+      ],
+      [
+        "Alice",
+        0.22
+      ]
+    ],
+    "GOLD": [
+      [
+        "Obsidia",
+        1.68
+      ],
+      [
+        "Popol and Kupa",
+        1.1
+      ],
+      [
+        "Bruno",
+        1.06
+      ],
+      [
+        "Hanabi",
+        0.89
+      ],
+      [
+        "Irithel",
+        0.65
+      ],
+      [
+        "Beatrix",
+        0.58
+      ],
+      [
+        "Clint",
+        0.48
+      ],
+      [
+        "Natan",
+        0.29
+      ],
+      [
+        "Moskov",
+        0.23
+      ],
+      [
+        "Brody",
+        0.18
+      ]
+    ],
+    "JUNGLE": [
+      [
+        "Aulus",
+        3.22
+      ],
+      [
+        "Hirara",
+        1.33
+      ],
+      [
+        "Popol and Kupa",
+        1.1
+      ],
+      [
+        "Ling",
+        0.99
+      ],
+      [
+        "Sun",
+        0.99
+      ],
+      [
+        "Barats",
+        0.63
+      ],
+      [
+        "Fredrinn",
+        0.42
+      ],
+      [
+        "Alice",
+        0.22
+      ],
+      [
+        "Bane",
+        0.2
+      ],
+      [
+        "Leomord",
+        0.11
+      ]
+    ],
+    "MID": [
+      [
+        "Valir",
+        1.13
+      ],
+      [
+        "Gord",
+        0.96
+      ],
+      [
+        "Kagura",
+        0.79
+      ],
+      [
+        "Eudora",
+        0.58
+      ],
+      [
+        "Kadita",
+        0.57
+      ],
+      [
+        "Zhask",
+        0.54
+      ],
+      [
+        "Zetian",
+        0.44
+      ],
+      [
+        "Cyclops",
+        0.35
+      ],
+      [
+        "Cecilion",
+        0.3
+      ],
+      [
+        "Faramis",
+        0.12
+      ]
+    ],
+    "ROAM": [
+      [
+        "Rafaela",
+        3.79
+      ],
+      [
+        "Minotaur",
+        1.95
+      ],
+      [
+        "Marcel",
+        1.87
+      ],
+      [
+        "Floryn",
+        1.74
+      ],
+      [
+        "Carmilla",
+        1.45
+      ],
+      [
+        "Gloo",
+        1.36
+      ],
+      [
+        "Estes",
+        1.11
+      ],
+      [
+        "Khufra",
+        1.1
+      ],
+      [
+        "Belerick",
+        1.09
+      ],
+      [
+        "Atlas",
+        0.76
+      ]
+    ]
+  },
+  "tournamentTiers": {
+    "Akai": "SS",
+    "Floryn": "SS",
+    "Gloo": "SS",
+    "Hirara": "SS",
+    "Marcel": "SS",
+    "Paquito": "SS",
+    "Atlas": "S",
+    "Baxia": "S",
+    "Belerick": "S",
+    "Diggie": "S",
+    "Estes": "S",
+    "Fredrinn": "S",
+    "Guinevere": "S",
+    "Helcurt": "S",
+    "Sun": "S",
+    "Zhuxin": "S",
+    "Angela": "A",
+    "Beatrix": "A",
+    "Gord": "A",
+    "Harley": "A",
+    "Kadita": "A",
+    "Kaja": "A",
+    "Lesley": "A",
+    "Minotaur": "A",
+    "Minsitthar": "A",
+    "Miya": "A",
+    "Sora": "A",
+    "Yi Sun-shin": "A",
+    "Zetian": "A",
+    "Alice": "B",
+    "Chip": "B",
+    "Freya": "B",
+    "Granger": "B",
+    "Gusion": "B",
+    "Hanabi": "B",
+    "Harith": "B",
+    "Hilda": "B",
+    "Karrie": "B",
+    "Khufra": "B",
+    "Ling": "B",
+    "Lukas": "B",
+    "Masha": "B",
+    "Mathilda": "B",
+    "Phoveus": "B",
+    "Rafaela": "B",
+    "Saber": "B",
+    "Selena": "B",
+    "Suyou": "B",
+    "Aamon": "C",
+    "Argus": "C",
+    "Arlott": "C",
+    "Aulus": "C",
+    "Badang": "C",
+    "Balmond": "C",
+    "Benedetta": "C",
+    "Brody": "C",
+    "Carmilla": "C",
+    "Chou": "C",
+    "Claude": "C",
+    "Clint": "C",
+    "Eudora": "C",
+    "Fanny": "C",
+    "Faramis": "C",
+    "Grock": "C",
+    "Hanzo": "C",
+    "Irithel": "C",
+    "Ixia": "C",
+    "Joy": "C",
+    "Kagura": "C",
+    "Kimmy": "C",
+    "Leomord": "C",
+    "Lolita": "C",
+    "Melissa": "C",
+    "Moskov": "C",
+    "Natalia": "C",
+    "Obsidia": "C",
+    "Odette": "C",
+    "Popol and Kupa": "C",
+    "Ruby": "C",
+    "Silvanna": "C",
+    "Thamuz": "C",
+    "Tigreal": "C",
+    "Uranus": "C",
+    "Valir": "C",
+    "Yin": "C",
+    "Yu Zhong": "C",
+    "Yve": "C",
+    "Aldous": "D",
+    "Alpha": "D",
+    "Alucard": "D",
+    "Aurora": "D",
+    "Bane": "D",
+    "Barats": "D",
+    "Bruno": "D",
+    "Cecilion": "D",
+    "Chang'e": "D",
+    "Cici": "D",
+    "Cyclops": "D",
+    "Dyrroth": "D",
+    "Edith": "D",
+    "Esmeralda": "D",
+    "Franco": "D",
+    "Gatotkaca": "D",
+    "Hayabusa": "D",
+    "Hylos": "D",
+    "Jawhead": "D",
+    "Johnson": "D",
+    "Julian": "D",
+    "Kalea": "D",
+    "Karina": "D",
+    "Khaleed": "D",
+    "Lancelot": "D",
+    "Lapu-Lapu": "D",
+    "Layla": "D",
+    "Lunox": "D",
+    "Luo Yi": "D",
+    "Lylia": "D",
+    "Martis": "D",
+    "Nana": "D",
+    "Natan": "D",
+    "Nolan": "D",
+    "Novaria": "D",
+    "Pharsa": "D",
+    "Roger": "D",
+    "Terizla": "D",
+    "Vale": "D",
+    "Valentina": "D",
+    "Vexana": "D",
+    "Wanwan": "D",
+    "X.Borg": "D",
+    "Xavier": "D",
+    "Zhask": "D",
+    "Zilong": "D"
+  },
+  "firstPickRanking": {
+    "Rafaela": 4.01,
+    "Kadita": 3.4,
+    "Yi Sun-shin": 3.33,
+    "Cecilion": 3.18,
+    "Zetian": 3.13,
+    "Paquito": 3.08,
+    "Clint": 2.92,
+    "Obsidia": 2.72,
+    "Julian": 2.65,
+    "Suyou": 2.57,
+    "Tigreal": -3.55,
+    "Esmeralda": -3.26,
+    "Karina": -3.13,
+    "Balmond": -3.12,
+    "Alpha": -3.08,
+    "X.Borg": -3.04,
+    "Zilong": -3.03,
+    "Phoveus": -3.03,
+    "Johnson": -3.01,
+    "Granger": -2.82
+  },
+  "notes": [
+    "All values are bundled from the user-supplied datasets.",
+    "No pairwise matchup/synergy values were invented; only supplied aggregate ranking values are included."
+  ]
 }
