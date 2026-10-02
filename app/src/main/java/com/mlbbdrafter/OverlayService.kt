@@ -128,9 +128,15 @@ class OverlayService : Service() {
         }
 
         build()
-        runCatching { wm.addView(root, lp) }
-            .onFailure { stopSelf() }
-        if (::root.isInitialized) refresh()
+        try {
+            wm.addView(root, lp)
+            refresh()
+        } catch (_: Exception) {
+            // If the overlay window cannot be attached, cleanly stop the service
+            // instead of crashing the app process.
+            runCatching { if (::root.isInitialized) wm.removeViewImmediate(root) }
+            stopSelf()
+        }
     }
 
     override fun onDestroy() {
