@@ -1,0 +1,26 @@
+{
+ "label": "SAMPLE - NOT REAL STATISTICS. Import your own data.",
+ "heroes": [
+  {"id":"s_exp1","name":"SampleExp1","roles":["EXP"],"winRate":51,"pickRate":10,"banRate":5,"roleWinRate":{"EXP":52}},
+  {"id":"s_exp2","name":"SampleExp2","roles":["EXP"],"winRate":49,"pickRate":8,"banRate":3,"roleWinRate":{"EXP":49}},
+  {"id":"s_jg1","name":"SampleJg1","roles":["JUNGLE"],"winRate":52,"pickRate":12,"banRate":9,"roleWinRate":{"JUNGLE":52}},
+  {"id":"s_jg2","name":"SampleJg2","roles":["JUNGLE"],"winRate":48,"pickRate":6,"banRate":2},
+  {"id":"s_mid1","name":"SampleMid1","roles":["MID"],"winRate":50,"pickRate":9,"banRate":4},
+  {"id":"s_mid2","name":"SampleMid2","roles":["MID"],"winRate":53,"pickRate":7,"banRate":6},
+  {"id":"s_gold1","name":"SampleGold1","roles":["GOLD"],"winRate":51,"pickRate":11,"banRate":7},
+  {"id":"s_gold2","name":"SampleGold2","roles":["GOLD"],"winRate":47,"pickRate":5,"banRate":1},
+  {"id":"s_roam1","name":"SampleRoam1","roles":["ROAM"],"winRate":50,"pickRate":8,"banRate":3},
+  {"id":"s_roam2","name":"SampleRoam2","roles":["ROAM"],"winRate":52,"pickRate":6,"banRate":4}
+ ],
+ "matchups": [
+  {"a":"s_exp1","b":"s_exp2","winRate":54,"games":1000},
+  {"a":"s_jg1","b":"s_jg2","winRate":55,"games":800},
+  {"a":"s_mid2","b":"s_mid1","winRate":53,"games":600},
+  {"a":"s_jg1","b":"s_gold2","winRate":56,"games":300}
+ ],
+ "synergies": [
+  {"a":"s_exp1","b":"s_roam2","winRate":54,"games":500},
+  {"a":"s_jg1","b":"s_mid2","winRate":55,"games":400},
+  {"a":"s_gold1","b":"s_roam1","winRate":53,"games":450}
+ ]
+}
