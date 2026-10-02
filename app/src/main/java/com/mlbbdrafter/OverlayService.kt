@@ -26,6 +26,7 @@ class OverlayService : Service() {
     private lateinit var panel: LinearLayout
     private lateinit var mini: TextView
     private lateinit var content: LinearLayout
+    private lateinit var summary: LinearLayout
     private lateinit var barA: View
     private lateinit var barE: View
     private lateinit var probA: TextView
@@ -58,8 +59,8 @@ class OverlayService : Service() {
         ds = Store.load(this)
 
         lp = WindowManager.LayoutParams(
-            prefs.getInt("w", dp(360)),
-            prefs.getInt("h", dp(620)),
+            prefs.getInt("w", dp(320)),
+            prefs.getInt("h", dp(520)),
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
                 WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
@@ -115,9 +116,9 @@ class OverlayService : Service() {
 
     private fun sectionTitle(text: String) = TextView(this).apply {
         this.text = text
-        mono(this, 10f, neon)
+        mono(this, 9f, neon)
         gravity = Gravity.CENTER
-        setPadding(0, dp(5), 0, dp(4))
+        setPadding(0, dp(3), 0, dp(2))
         letterSpacing = 0.08f
     }
 
@@ -128,7 +129,7 @@ class OverlayService : Service() {
             gravity = Gravity.CENTER
             setPadding(dp(2), 0, dp(2), 0)
             background = box(Color.parseColor("#A60C1510"), neonDim, 3f)
-            layoutParams = LinearLayout.LayoutParams(0, dp(30), 1f).apply {
+            layoutParams = LinearLayout.LayoutParams(0, dp(26), 1f).apply {
                 marginStart = dp(2)
                 marginEnd = dp(2)
             }
@@ -173,7 +174,7 @@ class OverlayService : Service() {
             gravity = Gravity.CENTER
             setPadding(dp(5), 0, dp(5), 0)
             background = box(Color.parseColor("#B20D1711"), neonDim, 3f)
-            layoutParams = LinearLayout.LayoutParams(0, dp(30), 1f).apply {
+            layoutParams = LinearLayout.LayoutParams(0, dp(26), 1f).apply {
                 marginStart = dp(2)
                 marginEnd = dp(2)
             }
@@ -184,8 +185,8 @@ class OverlayService : Service() {
     private fun setMinimized(m: Boolean) {
         panel.visibility = if (m) View.GONE else View.VISIBLE
         mini.visibility = if (m) View.VISIBLE else View.GONE
-        lp.width = if (m) WindowManager.LayoutParams.WRAP_CONTENT else prefs.getInt("w", dp(360))
-        lp.height = if (m) WindowManager.LayoutParams.WRAP_CONTENT else prefs.getInt("h", dp(620))
+        lp.width = if (m) WindowManager.LayoutParams.WRAP_CONTENT else prefs.getInt("w", dp(320))
+        lp.height = if (m) WindowManager.LayoutParams.WRAP_CONTENT else prefs.getInt("h", dp(520))
         wm.updateViewLayout(root, lp)
     }
 
@@ -194,7 +195,7 @@ class OverlayService : Service() {
 
         panel = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(dp(8), dp(6), dp(8), dp(5))
+            setPadding(dp(5), dp(4), dp(5), dp(3))
             background = box(bg, neon, 2f)
         }
 
@@ -202,26 +203,26 @@ class OverlayService : Service() {
         val title = label("[ AI LINEUP DRAFTER ]", 11f, neon, true).apply {
             gravity = Gravity.CENTER
             letterSpacing = 0.08f
-            layoutParams = LinearLayout.LayoutParams(0, dp(34), 1f)
+            layoutParams = LinearLayout.LayoutParams(0, dp(29), 1f)
         }
         drag(title)
 
         val close = TextView(this).apply {
             text = "[X]"
-            mono(this, 10f, neon)
+            mono(this, 9f, neon)
             gravity = Gravity.CENTER
             background = box(Color.TRANSPARENT, Color.TRANSPARENT, 2f)
-            layoutParams = LinearLayout.LayoutParams(dp(38), dp(30))
+            layoutParams = LinearLayout.LayoutParams(dp(32), dp(27))
             setOnClickListener { stopSelf() }
         }
         val min = TextView(this).apply {
             text = "[-]"
-            mono(this, 10f, neon)
+            mono(this, 9f, neon)
             gravity = Gravity.CENTER
-            layoutParams = LinearLayout.LayoutParams(dp(38), dp(30))
+            layoutParams = LinearLayout.LayoutParams(dp(32), dp(27))
             setOnClickListener { setMinimized(true) }
         }
-        panel.addView(row(title, min, close, height = 34))
+        panel.addView(row(title, min, close, height = 29))
 
         val dataLabel = label(
             "DATA  ${ds.label.uppercase()}",
@@ -240,15 +241,17 @@ class OverlayService : Service() {
         panel.addView(banRow(d.enemyBans, "Enemy ban"))
 
         // Manual controls kept compact so the visual overlay stays clean.
-        panel.addView(
-            row(
-                actionButton("+ ALLY BAN") { pick("Ally ban", d.allyBans) },
-                actionButton("+ ENEMY BAN") { pick("Enemy ban", d.enemyBans) },
-                actionButton("UNDO") { d.undo(); refresh() },
-                actionButton("RESET") { d.clear(); refresh() },
-                actionButton("ANALYZE") { ds = Store.load(this); refresh() }
-            )
+        val controls1 = row(
+            actionButton("+ ALLY BAN") { pick("Ally ban", d.allyBans) },
+            actionButton("+ ENEMY BAN") { pick("Enemy ban", d.enemyBans) },
+            actionButton("UNDO") { d.undo(); refresh() }
         )
+        val controls2 = row(
+            actionButton("RESET") { d.clear(); refresh() },
+            actionButton("ANALYZE") { ds = Store.load(this); refresh() }
+        )
+        panel.addView(controls1)
+        panel.addView(controls2)
 
         val scroll = ScrollView(this).apply {
             isFillViewport = true
@@ -260,6 +263,14 @@ class OverlayService : Service() {
         }
         scroll.addView(content)
         panel.addView(scroll, LinearLayout.LayoutParams(-1, 0, 1f))
+
+        // Fixed bottom summary: keeps Priority Picks, Ban Priority and Matchup Probability
+        // visible without requiring the user to scroll the overlay.
+        summary = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(0, dp(1), 0, 0)
+        }
+        panel.addView(summary, LinearLayout.LayoutParams(-1, dp(154)))
 
         // Bottom resize handle
         val handle = label("◢  RESIZE", 8f, muted).apply {
@@ -309,7 +320,7 @@ class OverlayService : Service() {
         val r = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER
-            layoutParams = LinearLayout.LayoutParams(-1, dp(34))
+            layoutParams = LinearLayout.LayoutParams(-1, dp(29))
         }
         for (i in 0 until 5) {
             val id = list.getOrNull(i)
@@ -327,7 +338,7 @@ class OverlayService : Service() {
         val r = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER
-            layoutParams = LinearLayout.LayoutParams(-1, dp(32))
+            layoutParams = LinearLayout.LayoutParams(-1, dp(28))
         }
         for (i in 0 until 5) {
             val id = list.getOrNull(i)
@@ -346,11 +357,10 @@ class OverlayService : Service() {
     }
 
     private fun refresh() {
-        val nm: (String) -> String = { id -> ds.heroes[id]?.name ?: id }
-
         content.removeAllViews()
+        summary.removeAllViews()
 
-        // Picks are shown because the recommendation engine needs the current draft.
+        // Scrollable area: current picks + optimal vectors.
         addSectionHeader(content, "ALLY PICKS")
         content.addView(pickRow(d.allyPicks, "Ally pick"))
         addSectionHeader(content, "ENEMY PICKS")
@@ -361,7 +371,7 @@ class OverlayService : Service() {
         addSectionHeader(content, ">> OPTIMAL PICK VECTORS <<")
         val vectorCard = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(dp(6), dp(4), dp(6), dp(5))
+            setPadding(dp(4), dp(1), dp(4), dp(2))
             background = box(card, Color.parseColor("#214F2D"), 4f)
         }
 
@@ -369,22 +379,17 @@ class OverlayService : Service() {
             val scores = pickMap[role].orEmpty()
             val main = scores.getOrNull(0)
             val flex = scores.getOrNull(1)
-            val text = if (main == null) {
-                "NO DATA"
-            } else {
-                "${main.hero.name} / ${flex?.hero?.name ?: "—"}"
-            }
+            val text = if (main == null) "NO DATA" else "${main.hero.name} / ${flex?.hero?.name ?: "—"}"
             val scoreText = if (main == null) "" else "  ${"%.0f".format(main.score)}"
             val r = LinearLayout(this).apply {
                 orientation = LinearLayout.HORIZONTAL
                 gravity = Gravity.CENTER_VERTICAL
-                layoutParams = LinearLayout.LayoutParams(-1, dp(31))
+                layoutParams = LinearLayout.LayoutParams(-1, dp(26))
             }
-            r.addView(label(role, 9f, neon, true).apply {
-                gravity = Gravity.CENTER_VERTICAL
-                layoutParams = LinearLayout.LayoutParams(dp(58), -1)
+            r.addView(label(role, 8.5f, neon, true).apply {
+                layoutParams = LinearLayout.LayoutParams(dp(45), -1)
             })
-            r.addView(label(text + scoreText, 9f, white).apply {
+            r.addView(label(text + scoreText, 8.5f, white).apply {
                 ellipsize = android.text.TextUtils.TruncateAt.END
                 maxLines = 1
                 layoutParams = LinearLayout.LayoutParams(0, -1, 1f)
@@ -393,166 +398,248 @@ class OverlayService : Service() {
         }
         content.addView(vectorCard)
 
-        // Main + widest picks.
+        // Fixed summary area: always visible at the bottom of the compact overlay.
         val all = pickMap.values.flatten()
-        val mainPick = all.maxByOrNull { it.score }
-
-        val widest = ds.heroes.values
+        val rankPick = all.maxByOrNull { it.score }
+        val tournamentPick = ds.heroes.values
             .filter { it.id !in d.used() }
             .mapNotNull { h ->
                 val roleCount = h.roles.distinct().size
                 if (roleCount == 0) null
-                else {
-                    val bestScore = all.filter { it.hero.id == h.id }.maxOfOrNull { it.score } ?: 0.0
-                    Triple(h, roleCount, bestScore)
-                }
+                else Triple(h, roleCount, all.filter { it.hero.id == h.id }.maxOfOrNull { it.score } ?: 0.0)
             }
             .maxWithOrNull(compareBy<Triple<Hero, Int, Double>> { it.second }.thenBy { it.third })
 
-        addSectionHeader(content, ">> PRIORITY PICKS <<")
+        addSectionHeader(summary, ">> PRIORITY PICKS <<")
         val priority = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
-            setPadding(dp(4), dp(4), dp(4), dp(4))
+            setPadding(dp(2), 0, dp(2), dp(1))
         }
 
-        fun priorityCard(title: String, hero: Hero?, subtitle: String, accent: Int): TextView {
-            return TextView(this).apply {
-                text = if (hero == null) "$title\nNO DATA\n$subtitle"
-                else "$title\n${hero.name}\n$subtitle"
-                mono(this, 9f, white)
-                gravity = Gravity.CENTER
-                setPadding(dp(4), dp(4), dp(4), dp(4))
-                background = box(Color.parseColor("#A6101812"), accent, 4f)
-                layoutParams = LinearLayout.LayoutParams(0, dp(62), 1f).apply {
-                    marginStart = dp(2)
-                    marginEnd = dp(2)
-                }
+        fun priorityCard(title: String, hero: Hero?, subtitle: String, accent: Int): TextView = TextView(this).apply {
+            text = if (hero == null) "$title\nNO DATA\n$subtitle" else "$title\n${hero.name}\n$subtitle"
+            mono(this, 7.2f, white)
+            gravity = Gravity.CENTER
+            setPadding(dp(2), dp(1), dp(2), dp(1))
+            background = box(Color.parseColor("#A6101812"), accent, 3f)
+            layoutParams = LinearLayout.LayoutParams(0, dp(42), 1f).apply {
+                marginStart = dp(2)
+                marginEnd = dp(2)
             }
         }
+        priority.addView(priorityCard(
+            "★ RANK PICK", rankPick?.hero,
+            if (rankPick == null) "no scored candidate" else "score ${"%.0f".format(rankPick.score)}", neon
+        ))
+        priority.addView(priorityCard(
+            "◎ TOURNAMENT PICK", tournamentPick?.first,
+            if (tournamentPick == null) "no role data" else "${tournamentPick.second} role${if (tournamentPick.second == 1) "" else "s"}", amber
+        ))
+        summary.addView(priority)
 
-        priority.addView(
-            priorityCard(
-                "★ MAIN PICK",
-                mainPick?.hero,
-                if (mainPick == null) "no scored candidate" else "score ${"%.0f".format(mainPick.score)}",
-                neon
-            )
-        )
-        priority.addView(
-            priorityCard(
-                "◎ WIDEST PICK",
-                widest?.first,
-                if (widest == null) "no role data" else "${widest.second} role${if (widest.second == 1) "" else "s"} • score ${"%.0f".format(widest.third)}",
-                amber
-            )
-        )
-        content.addView(priority)
-
-        // Ban priority, compact.
-        addSectionHeader(content, ">> BAN PRIORITY <<")
+        addSectionHeader(summary, ">> BAN PRIORITY <<")
         val bans = Engine.bans(ds, d, SettingsManager.ban(this))
         if (bans.isEmpty()) {
-            content.addView(label("NO DATA", 9f, muted).apply {
+            summary.addView(label("NO DATA", 7.5f, muted).apply {
                 gravity = Gravity.CENTER
-                setPadding(0, dp(4), 0, dp(4))
+                setPadding(0, 0, 0, dp(1))
             })
         } else {
-            bans.take(3).forEachIndexed { i, s ->
-                val why = s.why.take(1).joinToString()
-                content.addView(label(
-                    "${i + 1}. ${s.hero.name}   ${"%.0f".format(s.score)}${if (s.incomplete) "*" else ""}" +
-                        if (why.isNotEmpty()) "  •  $why" else "",
-                    8.5f,
-                    white
-                ).apply {
-                    setPadding(dp(6), dp(3), dp(6), dp(3))
-                })
+            val banLine = bans.take(2).joinToString("   •   ") { s ->
+                "${s.hero.name} ${"%.0f".format(s.score)}${if (s.incomplete) "*" else ""}"
             }
+            summary.addView(label(banLine, 7.3f, white).apply {
+                gravity = Gravity.CENTER
+                setPadding(dp(4), 0, dp(4), dp(1))
+                maxLines = 1
+                ellipsize = android.text.TextUtils.TruncateAt.END
+            })
         }
 
-        // Probability
-        addSectionHeader(content, ">> MATCHUP PROBABILITY <<")
+        addSectionHeader(summary, ">> MATCHUP PROBABILITY <<")
         val p = Engine.prob(ds, d)
         val a = p?.ally ?: 50.0
         val e = 100.0 - a
-
         val probWrap = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(dp(5), dp(4), dp(5), dp(5))
-            background = box(card, Color.parseColor("#214F2D"), 4f)
+            setPadding(dp(5), dp(1), dp(5), dp(2))
+            background = box(card, Color.parseColor("#214F2D"), 3f)
         }
-
-        val probLabels = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
-        }
-        probA = label("ALLY  ${"%.1f".format(a)}%", 8.5f, neon, true).apply {
+        val probLabels = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+        probA = label("ALLY  ${"%.1f".format(a)}%", 7.8f, neon, true).apply {
             gravity = Gravity.START
-            layoutParams = LinearLayout.LayoutParams(0, dp(20), 1f)
+            layoutParams = LinearLayout.LayoutParams(0, dp(16), 1f)
         }
-        probE = label("ENEMY  ${"%.1f".format(e)}%", 8.5f, red, true).apply {
+        probE = label("ENEMY  ${"%.1f".format(e)}%", 7.8f, red, true).apply {
             gravity = Gravity.END
-            layoutParams = LinearLayout.LayoutParams(0, dp(20), 1f)
+            layoutParams = LinearLayout.LayoutParams(0, dp(16), 1f)
         }
         probLabels.addView(probA)
         probLabels.addView(probE)
         probWrap.addView(probLabels)
-
         val track = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             background = box(Color.parseColor("#3A303838"), Color.TRANSPARENT, 2f)
-            layoutParams = LinearLayout.LayoutParams(-1, dp(10))
+            layoutParams = LinearLayout.LayoutParams(-1, dp(7))
         }
-        barA = View(this).apply {
-            setBackgroundColor(neon)
-            layoutParams = LinearLayout.LayoutParams(0, -1, a.toFloat())
-        }
-        barE = View(this).apply {
-            setBackgroundColor(red)
-            layoutParams = LinearLayout.LayoutParams(0, -1, e.toFloat())
-        }
+        barA = View(this).apply { setBackgroundColor(neon); layoutParams = LinearLayout.LayoutParams(0, -1, a.toFloat()) }
+        barE = View(this).apply { setBackgroundColor(red); layoutParams = LinearLayout.LayoutParams(0, -1, e.toFloat()) }
         track.addView(barA)
         track.addView(barE)
         probWrap.addView(track)
-
         if (p == null) {
-            probWrap.addView(label("No data — add picks with supplied stats.", 8f, muted).apply {
+            probWrap.addView(label("No data — add picks with supplied stats.", 6.8f, muted).apply {
                 gravity = Gravity.CENTER
-                setPadding(0, dp(4), 0, 0)
             })
         }
-        probWrap.addView(label(
-            "Estimate from supplied data only • not a guarantee",
-            7.5f,
-            muted
-        ).apply {
-            gravity = Gravity.CENTER
-            setPadding(0, dp(4), 0, 0)
-        })
-        content.addView(probWrap)
+        summary.addView(probWrap)
     }
 
+    /**
+     * Searchable hero picker used by every ban/pick slot.
+     * The user can type a hero name, then tap the exact result.
+     * No game state is read automatically; this only edits the manual draft.
+     */
     private fun pick(title: String, target: MutableList<String>) {
         if (target.size >= 5) return
 
-        val avail = ds.heroes.values
+        val available = ds.heroes.values
             .filter { it.id !in d.used() }
-            .sortedBy { it.name }
+            .sortedBy { it.name.lowercase() }
 
-        if (avail.isEmpty()) return
+        if (available.isEmpty()) return
 
-        AlertDialog.Builder(
+        val wrap = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(10), dp(2), dp(10), 0)
+        }
+
+        val search = EditText(this).apply {
+            hint = "Search hero name..."
+            setSingleLine(true)
+            textSize = 13f
+            setTextColor(white)
+            setHintTextColor(muted)
+            background = box(Color.parseColor("#C90D1711"), neonDim, 5f)
+            setPadding(dp(10), 0, dp(10), 0)
+        }
+        wrap.addView(search, LinearLayout.LayoutParams(-1, dp(40)))
+
+        // Quick-pick shortcuts are available when filling an ally pick.
+        // They use the same supplied-data engine as the cards on the main overlay.
+        if (title == "Ally pick") {
+            val scored = Engine.picks(ds, d, SettingsManager.pick(this)).values.flatten()
+            val mainHero = scored.maxByOrNull { it.score }?.hero
+            val widestHero = ds.heroes.values
+                .filter { it.id !in d.used() }
+                .mapNotNull { h ->
+                    val roleCount = h.roles.distinct().size
+                    if (roleCount == 0) null
+                    else Triple(h, roleCount, scored.filter { it.hero.id == h.id }.maxOfOrNull { it.score } ?: 0.0)
+                }
+                .maxWithOrNull(compareBy<Triple<Hero, Int, Double>> { it.second }.thenBy { it.third })?.first
+
+            val quick = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                setPadding(0, dp(2), 0, dp(2))
+            }
+
+            fun quickButton(text: String, hero: Hero?, accent: Int): TextView = TextView(this).apply {
+                this.text = if (hero == null) text else "$text\n${hero.name}"
+                mono(this, 7.5f, white)
+                gravity = Gravity.CENTER
+                setPadding(dp(4), dp(3), dp(4), dp(3))
+                background = box(Color.parseColor("#A6101812"), accent, 4f)
+                layoutParams = LinearLayout.LayoutParams(0, dp(48), 1f).apply {
+                    marginStart = dp(2)
+                    marginEnd = dp(2)
+                }
+                isEnabled = hero != null
+            }
+
+            quick.addView(quickButton("★ RANK PICK", mainHero, neon).apply {
+                setOnClickListener {
+                    mainHero?.let { d.add(target, it.id); refresh(); dialogRef?.dismiss() }
+                }
+            })
+            quick.addView(quickButton("◎ TOURNAMENT PICK", widestHero, amber).apply {
+                setOnClickListener {
+                    widestHero?.let { d.add(target, it.id); refresh(); dialogRef?.dismiss() }
+                }
+            })
+            wrap.addView(quick, LinearLayout.LayoutParams(-1, dp(48)))
+        }
+
+        val count = label("${available.size} heroes available", 8f, muted).apply {
+            setPadding(dp(2), dp(5), dp(2), dp(3))
+        }
+        wrap.addView(count)
+
+        val list = ListView(this).apply {
+            dividerHeight = dp(1)
+            divider = box(Color.parseColor("#5527A84C"), Color.TRANSPARENT, 0f)
+        }
+        wrap.addView(list, LinearLayout.LayoutParams(-1, dp(280)))
+
+        fun names(filter: String): List<Hero> {
+            val q = filter.trim().lowercase()
+            return if (q.isEmpty()) available
+            else available.filter {
+                it.name.lowercase().contains(q) || it.id.lowercase().contains(q)
+            }
+        }
+
+        fun render(items: List<Hero>) {
+            count.text = if (items.isEmpty()) "No matching hero" else "${items.size} heroes"
+            list.adapter = object : ArrayAdapter<Hero>(
+                this, android.R.layout.simple_list_item_1, items
+            ) {
+                override fun getView(position: Int, convertView: View?, parent: android.view.ViewGroup): View {
+                    val v = super.getView(position, convertView, parent) as TextView
+                    v.text = getItem(position)?.name ?: ""
+                    v.textSize = 13f
+                    v.setTextColor(white)
+                    v.setPadding(dp(10), 0, dp(10), 0)
+                    v.setBackgroundColor(Color.TRANSPARENT)
+                    v.typeface = Typeface.create(Typeface.MONOSPACE, Typeface.NORMAL)
+                    return v
+                }
+            }
+            list.setOnItemClickListener { _, _, position, _ ->
+                val chosen = items[position]
+                d.add(target, chosen.id)
+                refresh()
+                dialogRef?.dismiss()
+            }
+        }
+
+        search.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                render(names(s?.toString().orEmpty()))
+            }
+            override fun afterTextChanged(s: android.text.Editable?) = Unit
+        })
+
+        val dialog = AlertDialog.Builder(
             ContextThemeWrapper(this, android.R.style.Theme_DeviceDefault_Dialog_Alert)
         )
             .setTitle(title)
-            .setItems(avail.map { it.name }.toTypedArray()) { _, i ->
-                d.add(target, avail[i].id)
-                refresh()
-            }
+            .setView(wrap)
             .setNegativeButton("Cancel", null)
             .create()
-            .apply {
-                window?.setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY)
-                show()
-            }
+
+        dialogRef = dialog
+        render(available)
+        dialog.window?.setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY)
+        dialog.setOnShowListener {
+            search.requestFocus()
+            dialog.window?.setSoftInputMode(
+                android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE
+            )
+        }
+        dialog.show()
     }
+
+    private var dialogRef: AlertDialog? = null
 }
