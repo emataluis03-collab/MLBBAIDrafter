@@ -1,5 +1,5 @@
 {
-  "label": "USER SUPPLIED • META + RANK + TOURNAMENT DATA",
+  "label": "USER SUPPLIED • TOURNAMENT + RANK + MLBB.GG + MLBB INSIGHTS",
   "heroes": [
     {
       "id": "Aulus",
@@ -25,7 +25,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "SS",
+        "winRate": 59.54,
+        "banRate": 28.88,
+        "pickRate": 1.5
+      }
     },
     {
       "id": "Rafaela",
@@ -49,7 +55,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": 0.16
+      "counterScore": 0.16,
+      "rankStats": {
+        "tier": "SS",
+        "winRate": 59.75,
+        "banRate": 24.95,
+        "pickRate": 1.47
+      }
     },
     {
       "id": "Masha",
@@ -73,7 +85,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "SS",
+        "winRate": 59.59,
+        "banRate": 46.83,
+        "pickRate": 0.89
+      }
     },
     {
       "id": "Marcel",
@@ -97,7 +115,13 @@
       "sourceBestVsRate": 0.59,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": 0.22
+      "counterScore": 0.22,
+      "rankStats": {
+        "tier": "SS",
+        "winRate": 58.34,
+        "banRate": 59.55,
+        "pickRate": 0.38
+      }
     },
     {
       "id": "Argus",
@@ -121,7 +145,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "S",
+        "winRate": 55.44,
+        "banRate": 1.18,
+        "pickRate": 0.55
+      }
     },
     {
       "id": "Minotaur",
@@ -145,7 +175,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "S",
+        "winRate": 54.53,
+        "banRate": 9.85,
+        "pickRate": 1.47
+      }
     },
     {
       "id": "Khufra",
@@ -169,7 +205,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "A",
+        "winRate": 54.79,
+        "banRate": 2.4,
+        "pickRate": 0.44
+      }
     },
     {
       "id": "Popol and Kupa",
@@ -196,7 +238,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "A",
+        "winRate": 52.68,
+        "banRate": 0.18,
+        "pickRate": 0.38
+      }
     },
     {
       "id": "Gloo",
@@ -223,7 +271,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "S",
+        "winRate": 53.43,
+        "banRate": 46.5,
+        "pickRate": 0.85
+      }
     },
     {
       "id": "Lolita",
@@ -245,7 +299,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": 0.59,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "A",
+        "winRate": 53.35,
+        "banRate": 0.15,
+        "pickRate": 0.08
+      }
     },
     {
       "id": "Floryn",
@@ -269,7 +329,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": 0.17
+      "counterScore": 0.17,
+      "rankStats": {
+        "tier": "S",
+        "winRate": 53.61,
+        "banRate": 16.31,
+        "pickRate": 1.2
+      }
     },
     {
       "id": "Carmilla",
@@ -293,7 +359,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": 0.31,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "S",
+        "winRate": 53.2,
+        "banRate": 23.14,
+        "pickRate": 1.7
+      }
     },
     {
       "id": "Valir",
@@ -317,7 +389,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "A",
+        "winRate": 53.19,
+        "banRate": 1.55,
+        "pickRate": 0.95
+      }
     },
     {
       "id": "Obsidia",
@@ -341,7 +419,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "S",
+        "winRate": 53.25,
+        "banRate": 15.3,
+        "pickRate": 2.79
+      }
     },
     {
       "id": "Diggie",
@@ -363,7 +447,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "A",
+        "winRate": 53.81,
+        "banRate": 4.68,
+        "pickRate": 0.21
+      }
     },
     {
       "id": "Hirara",
@@ -387,7 +477,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "SS",
+        "winRate": 53.48,
+        "banRate": 88.58,
+        "pickRate": 0.68
+      }
     },
     {
       "id": "Bruno",
@@ -411,7 +507,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "A",
+        "winRate": 53.17,
+        "banRate": 0.38,
+        "pickRate": 0.67
+      }
     },
     {
       "id": "Lukas",
@@ -435,7 +537,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "SS",
+        "winRate": 53.0,
+        "banRate": 51.7,
+        "pickRate": 1.28
+      }
     },
     {
       "id": "Gord",
@@ -459,7 +567,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "A",
+        "winRate": 53.68,
+        "banRate": 0.23,
+        "pickRate": 0.57
+      }
     },
     {
       "id": "Estes",
@@ -483,7 +597,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "S",
+        "winRate": 52.17,
+        "banRate": 28.3,
+        "pickRate": 0.66
+      }
     },
     {
       "id": "Edith",
@@ -509,7 +629,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "A",
+        "winRate": 52.63,
+        "banRate": 0.26,
+        "pickRate": 0.36
+      }
     },
     {
       "id": "Ling",
@@ -533,7 +659,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "A",
+        "winRate": 52.37,
+        "banRate": 1.26,
+        "pickRate": 1.01
+      }
     },
     {
       "id": "Benedetta",
@@ -557,7 +689,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "A",
+        "winRate": 51.58,
+        "banRate": 0.26,
+        "pickRate": 0.46
+      }
     },
     {
       "id": "Yve",
@@ -579,7 +717,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": 0.24
+      "counterScore": 0.24,
+      "rankStats": {
+        "tier": "A",
+        "winRate": 53.26,
+        "banRate": 0.03,
+        "pickRate": 0.06
+      }
     },
     {
       "id": "Sun",
@@ -606,7 +750,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": 0.26,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "A",
+        "winRate": 49.79,
+        "banRate": 14.05,
+        "pickRate": 1.31
+      }
     },
     {
       "id": "Zhask",
@@ -630,7 +780,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "A",
+        "winRate": 52.0,
+        "banRate": 0.13,
+        "pickRate": 0.28
+      }
     },
     {
       "id": "Belerick",
@@ -654,7 +810,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "SS",
+        "winRate": 50.41,
+        "banRate": 67.7,
+        "pickRate": 1.67
+      }
     },
     {
       "id": "Irithel",
@@ -678,7 +840,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "A",
+        "winRate": 52.72,
+        "banRate": 0.12,
+        "pickRate": 0.46
+      }
     },
     {
       "id": "Kagura",
@@ -702,7 +870,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "A",
+        "winRate": 51.84,
+        "banRate": 1.22,
+        "pickRate": 0.78
+      }
     },
     {
       "id": "Hanabi",
@@ -726,7 +900,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "A",
+        "winRate": 50.13,
+        "banRate": 3.58,
+        "pickRate": 1.82
+      }
     },
     {
       "id": "Barats",
@@ -752,7 +932,13 @@
       "sourceBestVsRate": 0.59,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "A",
+        "winRate": 51.94,
+        "banRate": 8.27,
+        "pickRate": 1.03
+      }
     },
     {
       "id": "Atlas",
@@ -776,7 +962,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": 0.28,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "S",
+        "winRate": 50.64,
+        "banRate": 19.06,
+        "pickRate": 1.35
+      }
     },
     {
       "id": "Kadita",
@@ -800,7 +992,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "A",
+        "winRate": 52.04,
+        "banRate": 4.47,
+        "pickRate": 1.05
+      }
     },
     {
       "id": "Faramis",
@@ -826,7 +1024,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "A",
+        "winRate": 52.34,
+        "banRate": 0.36,
+        "pickRate": 0.12
+      }
     },
     {
       "id": "Beatrix",
@@ -850,7 +1054,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "A",
+        "winRate": 50.82,
+        "banRate": 0.32,
+        "pickRate": 0.9
+      }
     },
     {
       "id": "Guinevere",
@@ -874,7 +1084,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "A",
+        "winRate": 51.43,
+        "banRate": 3.15,
+        "pickRate": 1.07
+      }
     },
     {
       "id": "Natan",
@@ -898,7 +1114,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "B",
+        "winRate": 51.29,
+        "banRate": 0.11,
+        "pickRate": 0.36
+      }
     },
     {
       "id": "Cecilion",
@@ -922,7 +1144,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "A",
+        "winRate": 51.02,
+        "banRate": 0.09,
+        "pickRate": 0.7
+      }
     },
     {
       "id": "Cyclops",
@@ -946,7 +1174,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "B",
+        "winRate": 50.85,
+        "banRate": 0.13,
+        "pickRate": 0.57
+      }
     },
     {
       "id": "Eudora",
@@ -970,7 +1204,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "SS",
+        "winRate": 51.47,
+        "banRate": 66.51,
+        "pickRate": 1.9
+      }
     },
     {
       "id": "Minsitthar",
@@ -996,7 +1236,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "A",
+        "winRate": 50.55,
+        "banRate": 5.58,
+        "pickRate": 0.58
+      }
     },
     {
       "id": "Clint",
@@ -1020,7 +1266,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "A",
+        "winRate": 51.45,
+        "banRate": 0.74,
+        "pickRate": 0.94
+      }
     },
     {
       "id": "Bane",
@@ -1046,7 +1298,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "B",
+        "winRate": 51.11,
+        "banRate": 0.08,
+        "pickRate": 0.26
+      }
     },
     {
       "id": "Fredrinn",
@@ -1070,7 +1328,13 @@
       "sourceBestVsRate": 0.59,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "A",
+        "winRate": 50.97,
+        "banRate": 2.2,
+        "pickRate": 0.66
+      }
     },
     {
       "id": "Natalia",
@@ -1094,7 +1358,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": 0.37,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "B",
+        "winRate": 50.21,
+        "banRate": 0.84,
+        "pickRate": 0.19
+      }
     },
     {
       "id": "Khaleed",
@@ -1116,7 +1386,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "B",
+        "winRate": 50.16,
+        "banRate": 0.07,
+        "pickRate": 0.15
+      }
     },
     {
       "id": "Silvanna",
@@ -1138,7 +1414,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "B",
+        "winRate": 49.15,
+        "banRate": 0.67,
+        "pickRate": 0.59
+      }
     },
     {
       "id": "Alice",
@@ -1165,7 +1447,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "A",
+        "winRate": 50.9,
+        "banRate": 4.12,
+        "pickRate": 1.01
+      }
     },
     {
       "id": "Zetian",
@@ -1189,7 +1477,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "A",
+        "winRate": 49.85,
+        "banRate": 3.38,
+        "pickRate": 2.03
+      }
     },
     {
       "id": "Terizla",
@@ -1211,7 +1505,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "B",
+        "winRate": 49.69,
+        "banRate": 0.09,
+        "pickRate": 0.35
+      }
     },
     {
       "id": "Aldous",
@@ -1235,7 +1535,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "B",
+        "winRate": 49.28,
+        "banRate": 0.3,
+        "pickRate": 0.33
+      }
     },
     {
       "id": "Brody",
@@ -1259,7 +1565,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "A",
+        "winRate": 50.44,
+        "banRate": 2.95,
+        "pickRate": 1.38
+      }
     },
     {
       "id": "Moskov",
@@ -1283,7 +1595,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "A",
+        "winRate": 51.62,
+        "banRate": 0.16,
+        "pickRate": 1.1
+      }
     },
     {
       "id": "Zhuxin",
@@ -1305,7 +1623,13 @@
       "sourceBestVsRate": 0.63,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": 0.22
+      "counterScore": 0.22,
+      "rankStats": {
+        "tier": "B",
+        "winRate": 49.77,
+        "banRate": 0.32,
+        "pickRate": 0.23
+      }
     },
     {
       "id": "Hilda",
@@ -1329,7 +1653,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "C",
+        "winRate": 47.83,
+        "banRate": 1.83,
+        "pickRate": 0.41
+      }
     },
     {
       "id": "Leomord",
@@ -1353,7 +1683,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "B",
+        "winRate": 50.16,
+        "banRate": 0.25,
+        "pickRate": 0.38
+      }
     },
     {
       "id": "Paquito",
@@ -1375,7 +1711,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "SS",
+        "winRate": 50.27,
+        "banRate": 54.84,
+        "pickRate": 1.92
+      }
     },
     {
       "id": "Akai",
@@ -1397,7 +1739,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "B",
+        "winRate": 49.49,
+        "banRate": 1.27,
+        "pickRate": 0.38
+      }
     },
     {
       "id": "Badang",
@@ -1421,7 +1769,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": 0.3,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "A",
+        "winRate": 50.12,
+        "banRate": 9.42,
+        "pickRate": 1.72
+      }
     },
     {
       "id": "Vale",
@@ -1443,7 +1797,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": 0.66,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "B",
+        "winRate": 49.23,
+        "banRate": 0.06,
+        "pickRate": 0.34
+      }
     },
     {
       "id": "Julian",
@@ -1467,7 +1827,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "B",
+        "winRate": 49.86,
+        "banRate": 0.42,
+        "pickRate": 0.64
+      }
     },
     {
       "id": "Sora",
@@ -1489,7 +1855,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "B",
+        "winRate": 49.84,
+        "banRate": 2.42,
+        "pickRate": 0.75
+      }
     },
     {
       "id": "Yi Sun-shin",
@@ -1511,7 +1883,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "S",
+        "winRate": 49.39,
+        "banRate": 10.36,
+        "pickRate": 1.93
+      }
     },
     {
       "id": "Uranus",
@@ -1533,7 +1911,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "B",
+        "winRate": 49.36,
+        "banRate": 0.22,
+        "pickRate": 0.38
+      }
     },
     {
       "id": "Ixia",
@@ -1555,7 +1939,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "B",
+        "winRate": 49.56,
+        "banRate": 0.43,
+        "pickRate": 0.72
+      }
     },
     {
       "id": "Novaria",
@@ -1577,7 +1967,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "A",
+        "winRate": 49.78,
+        "banRate": 3.63,
+        "pickRate": 1.66
+      }
     },
     {
       "id": "Xavier",
@@ -1599,7 +1995,13 @@
       "sourceBestVsRate": 0.59,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "B",
+        "winRate": 50.61,
+        "banRate": 0.09,
+        "pickRate": 0.63
+      }
     },
     {
       "id": "X.Borg",
@@ -1621,7 +2023,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": 0.25,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "B",
+        "winRate": 48.95,
+        "banRate": 0.92,
+        "pickRate": 0.59
+      }
     },
     {
       "id": "Suyou",
@@ -1643,7 +2051,13 @@
       "sourceBestVsRate": 0.58,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "B",
+        "winRate": 49.24,
+        "banRate": 0.97,
+        "pickRate": 1.02
+      }
     },
     {
       "id": "Odette",
@@ -1665,7 +2079,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "B",
+        "winRate": 50.42,
+        "banRate": 0.25,
+        "pickRate": 0.53
+      }
     },
     {
       "id": "Lylia",
@@ -1687,7 +2107,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "C",
+        "winRate": 48.71,
+        "banRate": 0.19,
+        "pickRate": 0.5
+      }
     },
     {
       "id": "Ruby",
@@ -1709,7 +2135,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "B",
+        "winRate": 49.4,
+        "banRate": 0.13,
+        "pickRate": 0.46
+      }
     },
     {
       "id": "Miya",
@@ -1731,7 +2163,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "A",
+        "winRate": 49.94,
+        "banRate": 6.67,
+        "pickRate": 2.05
+      }
     },
     {
       "id": "Aamon",
@@ -1753,7 +2191,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "B",
+        "winRate": 49.01,
+        "banRate": 0.93,
+        "pickRate": 0.54
+      }
     },
     {
       "id": "Kaja",
@@ -1775,7 +2219,13 @@
       "sourceBestVsRate": 0.61,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": 0.15
+      "counterScore": 0.15,
+      "rankStats": {
+        "tier": "S",
+        "winRate": 49.7,
+        "banRate": 34.63,
+        "pickRate": 0.83
+      }
     },
     {
       "id": "Claude",
@@ -1797,7 +2247,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "B",
+        "winRate": 48.64,
+        "banRate": 0.14,
+        "pickRate": 0.97
+      }
     },
     {
       "id": "Saber",
@@ -1821,7 +2277,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "A",
+        "winRate": 50.56,
+        "banRate": 11.96,
+        "pickRate": 0.6
+      }
     },
     {
       "id": "Vexana",
@@ -1843,7 +2305,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": 0.59,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "B",
+        "winRate": 48.76,
+        "banRate": 0.59,
+        "pickRate": 1.24
+      }
     },
     {
       "id": "Hanzo",
@@ -1865,7 +2333,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "A",
+        "winRate": 48.34,
+        "banRate": 21.82,
+        "pickRate": 0.54
+      }
     },
     {
       "id": "Roger",
@@ -1887,7 +2361,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": 0.59,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "D",
+        "winRate": 47.29,
+        "banRate": 0.07,
+        "pickRate": 0.33
+      }
     },
     {
       "id": "Angela",
@@ -1909,7 +2389,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "A",
+        "winRate": 48.09,
+        "banRate": 8.85,
+        "pickRate": 1.9
+      }
     },
     {
       "id": "Selena",
@@ -1933,7 +2419,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "A",
+        "winRate": 49.16,
+        "banRate": 3.6,
+        "pickRate": 1.56
+      }
     },
     {
       "id": "Nolan",
@@ -1955,7 +2447,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "A",
+        "winRate": 49.4,
+        "banRate": 3.13,
+        "pickRate": 1.23
+      }
     },
     {
       "id": "Cici",
@@ -1977,7 +2475,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "C",
+        "winRate": 48.46,
+        "banRate": 0.53,
+        "pickRate": 0.51
+      }
     },
     {
       "id": "Yu Zhong",
@@ -1999,7 +2503,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "B",
+        "winRate": 48.7,
+        "banRate": 0.31,
+        "pickRate": 0.68
+      }
     },
     {
       "id": "Kimmy",
@@ -2023,7 +2533,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "B",
+        "winRate": 48.98,
+        "banRate": 0.22,
+        "pickRate": 0.67
+      }
     },
     {
       "id": "Lunox",
@@ -2045,7 +2561,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": 0.21
+      "counterScore": 0.21,
+      "rankStats": {
+        "tier": "B",
+        "winRate": 49.41,
+        "banRate": 0.09,
+        "pickRate": 0.3
+      }
     },
     {
       "id": "Joy",
@@ -2067,7 +2589,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "B",
+        "winRate": 49.66,
+        "banRate": 0.21,
+        "pickRate": 0.2
+      }
     },
     {
       "id": "Layla",
@@ -2089,7 +2617,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "D",
+        "winRate": 47.18,
+        "banRate": 0.46,
+        "pickRate": 0.58
+      }
     },
     {
       "id": "Wanwan",
@@ -2111,7 +2645,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "C",
+        "winRate": 48.65,
+        "banRate": 0.07,
+        "pickRate": 0.16
+      }
     },
     {
       "id": "Lapu-Lapu",
@@ -2133,7 +2673,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "D",
+        "winRate": 47.48,
+        "banRate": 0.13,
+        "pickRate": 0.44
+      }
     },
     {
       "id": "Gusion",
@@ -2157,7 +2703,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "B",
+        "winRate": 48.26,
+        "banRate": 3.09,
+        "pickRate": 1.27
+      }
     },
     {
       "id": "Yin",
@@ -2181,7 +2733,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "C",
+        "winRate": 48.73,
+        "banRate": 0.49,
+        "pickRate": 0.28
+      }
     },
     {
       "id": "Alucard",
@@ -2203,7 +2761,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "D",
+        "winRate": 47.71,
+        "banRate": 0.15,
+        "pickRate": 0.38
+      }
     },
     {
       "id": "Karrie",
@@ -2225,7 +2789,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": 0.58,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "B",
+        "winRate": 48.58,
+        "banRate": 1.06,
+        "pickRate": 0.67
+      }
     },
     {
       "id": "Aurora",
@@ -2247,7 +2817,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": 0.58,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "C",
+        "winRate": 48.77,
+        "banRate": 0.16,
+        "pickRate": 0.46
+      }
     },
     {
       "id": "Hylos",
@@ -2269,7 +2845,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "D",
+        "winRate": 47.13,
+        "banRate": 0.15,
+        "pickRate": 0.33
+      }
     },
     {
       "id": "Thamuz",
@@ -2291,7 +2873,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "C",
+        "winRate": 47.73,
+        "banRate": 0.42,
+        "pickRate": 0.49
+      }
     },
     {
       "id": "Johnson",
@@ -2313,7 +2901,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": 0.59,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "D",
+        "winRate": 45.87,
+        "banRate": 0.81,
+        "pickRate": 0.54
+      }
     },
     {
       "id": "Hayabusa",
@@ -2335,7 +2929,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "B",
+        "winRate": 48.3,
+        "banRate": 0.97,
+        "pickRate": 0.82
+      }
     },
     {
       "id": "Lesley",
@@ -2357,7 +2957,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": 0.16
+      "counterScore": 0.16,
+      "rankStats": {
+        "tier": "A",
+        "winRate": 48.47,
+        "banRate": 4.43,
+        "pickRate": 1.66
+      }
     },
     {
       "id": "Melissa",
@@ -2379,7 +2985,13 @@
       "sourceBestVsRate": 0.59,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": 0.17
+      "counterScore": 0.17,
+      "rankStats": {
+        "tier": "C",
+        "winRate": 48.08,
+        "banRate": 1.92,
+        "pickRate": 0.4
+      }
     },
     {
       "id": "Chang'e",
@@ -2401,7 +3013,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "D",
+        "winRate": 46.36,
+        "banRate": 0.13,
+        "pickRate": 0.55
+      }
     },
     {
       "id": "Arlott",
@@ -2423,7 +3041,13 @@
       "sourceBestVsRate": 0.59,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "C",
+        "winRate": 48.68,
+        "banRate": 0.25,
+        "pickRate": 0.45
+      }
     },
     {
       "id": "Freya",
@@ -2447,7 +3071,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": 0.27,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "C",
+        "winRate": 48.65,
+        "banRate": 0.63,
+        "pickRate": 0.44
+      }
     },
     {
       "id": "Alpha",
@@ -2471,7 +3101,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": 0.59,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "D",
+        "winRate": 46.31,
+        "banRate": 0.21,
+        "pickRate": 0.73
+      }
     },
     {
       "id": "Luo Yi",
@@ -2493,7 +3129,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "D",
+        "winRate": 47.27,
+        "banRate": 0.07,
+        "pickRate": 0.19
+      }
     },
     {
       "id": "Harley",
@@ -2517,7 +3159,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "B",
+        "winRate": 48.29,
+        "banRate": 1.38,
+        "pickRate": 0.62
+      }
     },
     {
       "id": "Phoveus",
@@ -2539,7 +3187,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "D",
+        "winRate": 47.36,
+        "banRate": 0.26,
+        "pickRate": 0.27
+      }
     },
     {
       "id": "Dyrroth",
@@ -2563,7 +3217,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "C",
+        "winRate": 47.7,
+        "banRate": 0.65,
+        "pickRate": 0.85
+      }
     },
     {
       "id": "Esmeralda",
@@ -2585,7 +3245,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "B",
+        "winRate": 47.08,
+        "banRate": 2.13,
+        "pickRate": 1.06
+      }
     },
     {
       "id": "Karina",
@@ -2607,7 +3273,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "D",
+        "winRate": 45.84,
+        "banRate": 2.06,
+        "pickRate": 0.75
+      }
     },
     {
       "id": "Pharsa",
@@ -2629,7 +3301,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "D",
+        "winRate": 47.32,
+        "banRate": 0.06,
+        "pickRate": 0.29
+      }
     },
     {
       "id": "Jawhead",
@@ -2653,7 +3331,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "D",
+        "winRate": 46.56,
+        "banRate": 0.12,
+        "pickRate": 0.22
+      }
     },
     {
       "id": "Helcurt",
@@ -2677,7 +3361,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": 0.31,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "D",
+        "winRate": 46.4,
+        "banRate": 3.77,
+        "pickRate": 0.37
+      }
     },
     {
       "id": "Nana",
@@ -2699,7 +3389,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": 0.62,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "C",
+        "winRate": 45.04,
+        "banRate": 1.51,
+        "pickRate": 1.49
+      }
     },
     {
       "id": "Grock",
@@ -2721,7 +3417,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "D",
+        "winRate": 46.04,
+        "banRate": 0.6,
+        "pickRate": 0.34
+      }
     },
     {
       "id": "Harith",
@@ -2743,7 +3445,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": 0.26,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "D",
+        "winRate": 47.21,
+        "banRate": 0.04,
+        "pickRate": 0.17
+      }
     },
     {
       "id": "Chip",
@@ -2765,7 +3473,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "D",
+        "winRate": 46.02,
+        "banRate": 0.23,
+        "pickRate": 0.06
+      }
     },
     {
       "id": "Baxia",
@@ -2789,7 +3503,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "D",
+        "winRate": 44.6,
+        "banRate": 0.09,
+        "pickRate": 0.06
+      }
     },
     {
       "id": "Martis",
@@ -2813,7 +3533,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "D",
+        "winRate": 46.97,
+        "banRate": 0.19,
+        "pickRate": 0.44
+      }
     },
     {
       "id": "Balmond",
@@ -2837,7 +3563,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "D",
+        "winRate": 44.7,
+        "banRate": 0.18,
+        "pickRate": 0.4
+      }
     },
     {
       "id": "Valentina",
@@ -2859,7 +3591,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "D",
+        "winRate": 45.62,
+        "banRate": 0.24,
+        "pickRate": 0.27
+      }
     },
     {
       "id": "Mathilda",
@@ -2881,7 +3619,13 @@
       "sourceBestVsRate": 0.6,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": 0.2
+      "counterScore": 0.2,
+      "rankStats": {
+        "tier": "D",
+        "winRate": 44.97,
+        "banRate": 0.26,
+        "pickRate": 0.19
+      }
     },
     {
       "id": "Zilong",
@@ -2903,7 +3647,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "D",
+        "winRate": 43.44,
+        "banRate": 0.24,
+        "pickRate": 0.25
+      }
     },
     {
       "id": "Chou",
@@ -2927,7 +3677,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "D",
+        "winRate": 44.8,
+        "banRate": 2.38,
+        "pickRate": 0.82
+      }
     },
     {
       "id": "Gatotkaca",
@@ -2951,7 +3707,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": 0.62,
       "synergyScore": 0.24,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "D",
+        "winRate": 43.99,
+        "banRate": 0.12,
+        "pickRate": 0.37
+      }
     },
     {
       "id": "Kalea",
@@ -2973,7 +3735,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "D",
+        "winRate": 44.28,
+        "banRate": 0.44,
+        "pickRate": 0.22
+      }
     },
     {
       "id": "Tigreal",
@@ -2995,7 +3763,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "D",
+        "winRate": 42.11,
+        "banRate": 4.37,
+        "pickRate": 1.67
+      }
     },
     {
       "id": "Granger",
@@ -3017,7 +3791,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "D",
+        "winRate": 43.49,
+        "banRate": 0.6,
+        "pickRate": 1.26
+      }
     },
     {
       "id": "Lancelot",
@@ -3039,7 +3819,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "D",
+        "winRate": 42.52,
+        "banRate": 0.16,
+        "pickRate": 0.49
+      }
     },
     {
       "id": "Fanny",
@@ -3061,7 +3847,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "D",
+        "winRate": 42.25,
+        "banRate": 1.51,
+        "pickRate": 0.67
+      }
     },
     {
       "id": "Franco",
@@ -3083,7 +3875,13 @@
       "sourceBestVsRate": null,
       "sourceWorstVsRate": null,
       "synergyScore": null,
-      "counterScore": null
+      "counterScore": null,
+      "rankStats": {
+        "tier": "D",
+        "winRate": 40.47,
+        "banRate": 2.46,
+        "pickRate": 0.69
+      }
     }
   ],
   "matchups": [],
@@ -3460,5 +4258,591 @@
   "notes": [
     "All values are bundled from the user-supplied datasets.",
     "No pairwise matchup/synergy values were invented; only supplied aggregate ranking values are included."
-  ]
+  ],
+  "rankSource": {
+    "name": "Hero Statistics",
+    "updatedAt": "2026-10-01",
+    "scope": "Rank / Mythic"
+  },
+  "tournamentSource": {
+    "name": "Tournament tier list",
+    "scope": "Tournament picks only",
+    "updatedAt": "2026-10-02"
+  },
+  "mlbbGGSource": {
+    "name": "MLBB.GG",
+    "scope": "Aggregate hero details and lane/role rankings"
+  },
+  "mlbbInsightsSource": {
+    "name": "MLBB Insights",
+    "updatedAt": "2026-10-01",
+    "scope": "Meta movers, strong/spammed, traps, hidden gems"
+  },
+  "insightsSnapshot": {
+    "latestSnapshot": "2026-10-01",
+    "tierScoreRisers1d": {
+      "Valir": 25.86,
+      "Badang": 22.77,
+      "Minsitthar": 19.63,
+      "Ling": 18.92,
+      "Cyclops": 18.5,
+      "Silvanna": 17.79,
+      "Irithel": 17.3,
+      "Julian": 15.81,
+      "Obsidia": 15.12,
+      "Sun": 13.73
+    },
+    "tierScoreFallers1d": {
+      "Granger": -40.47,
+      "Aamon": -24.84,
+      "Valentina": -23.99,
+      "Freya": -23.47,
+      "Harith": -22.67,
+      "Fanny": -21.41,
+      "Odette": -20.32,
+      "Chip": -18.09,
+      "Melissa": -17.35,
+      "Arlott": -17.19
+    },
+    "tierScoreRisers7d": {
+      "Valir": 131.68,
+      "Ling": 121.25,
+      "Obsidia": 113.96,
+      "Minsitthar": 107.72,
+      "Badang": 103.23,
+      "Argus": 91.37,
+      "Irithel": 86.09,
+      "Gord": 74.16,
+      "Belerick": 72.26,
+      "Cecilion": 69.77
+    },
+    "tierScoreFallers7d": {
+      "Granger": -198.83,
+      "Valentina": -138.67,
+      "Fanny": -132.84,
+      "Chip": -114.32,
+      "Freya": -110.39,
+      "Harith": -109.15,
+      "Chou": -108.94,
+      "Arlott": -96.37,
+      "Lylia": -91.11,
+      "Melissa": -87.46
+    },
+    "winRateRisers": {
+      "Johnson": 0.55,
+      "Valir": 0.55,
+      "Gatotkaca": 0.54,
+      "Masha": 0.43,
+      "Aulus": 0.41,
+      "Balmond": 0.4,
+      "Vale": 0.4,
+      "Uranus": 0.39,
+      "Claude": 0.38,
+      "Jawhead": 0.36
+    },
+    "winRateFallers": {
+      "Hirara": -0.74,
+      "Hanzo": -0.53,
+      "Fredrinn": -0.53,
+      "Lukas": -0.52,
+      "Kaja": -0.5,
+      "Joy": -0.5,
+      "Diggie": -0.45,
+      "Yu Zhong": -0.43,
+      "Mathilda": -0.43,
+      "Floryn": -0.43
+    }
+  },
+  "counterByLane": {
+    "EXP": [
+      [
+        "Rafaela",
+        0.38
+      ],
+      [
+        "Floryn",
+        0.36
+      ],
+      [
+        "Bruno",
+        0.35
+      ],
+      [
+        "Angela",
+        0.33
+      ],
+      [
+        "Lunox",
+        0.3
+      ]
+    ],
+    "GOLD": [
+      [
+        "Saber",
+        0.56
+      ],
+      [
+        "Moskov",
+        0.47
+      ],
+      [
+        "Arlott",
+        0.4
+      ],
+      [
+        "Eudora",
+        0.35
+      ],
+      [
+        "Kaja",
+        0.32
+      ]
+    ],
+    "JUNGLE": [
+      [
+        "Marcel",
+        0.36
+      ],
+      [
+        "Mathilda",
+        0.31
+      ],
+      [
+        "Cici",
+        0.3
+      ],
+      [
+        "Zhuxin",
+        0.28
+      ],
+      [
+        "Fanny",
+        0.27
+      ]
+    ],
+    "MID": [
+      [
+        "Helcurt",
+        0.41
+      ],
+      [
+        "Saber",
+        0.36
+      ],
+      [
+        "Hayabusa",
+        0.3
+      ],
+      [
+        "Nolan",
+        0.29
+      ],
+      [
+        "Novaria",
+        0.28
+      ]
+    ],
+    "ROAM": [
+      [
+        "Zhuxin",
+        0.64
+      ],
+      [
+        "Marcel",
+        0.56
+      ],
+      [
+        "Esmeralda",
+        0.55
+      ],
+      [
+        "Yve",
+        0.54
+      ],
+      [
+        "Alice",
+        0.53
+      ]
+    ]
+  },
+  "synergyByLane": {
+    "EXP": [
+      [
+        "Sun",
+        0.75
+      ],
+      [
+        "Bane",
+        0.73
+      ],
+      [
+        "Alpha",
+        0.49
+      ],
+      [
+        "Natalia",
+        0.48
+      ],
+      [
+        "Layla",
+        0.48
+      ]
+    ],
+    "GOLD": [
+      [
+        "Harith",
+        1.56
+      ],
+      [
+        "Popol and Kupa",
+        1.27
+      ],
+      [
+        "Roger",
+        0.69
+      ],
+      [
+        "Kimmy",
+        0.58
+      ],
+      [
+        "Masha",
+        0.47
+      ]
+    ],
+    "JUNGLE": [
+      [
+        "Dyrroth",
+        0.45
+      ],
+      [
+        "Granger",
+        0.41
+      ],
+      [
+        "Aldous",
+        0.39
+      ],
+      [
+        "Badang",
+        0.39
+      ],
+      [
+        "Argus",
+        0.39
+      ]
+    ],
+    "MID": [
+      [
+        "Harley",
+        0.83
+      ],
+      [
+        "Granger",
+        0.46
+      ],
+      [
+        "Freya",
+        0.44
+      ],
+      [
+        "Marcel",
+        0.42
+      ],
+      [
+        "Miya",
+        0.39
+      ]
+    ],
+    "ROAM": [
+      [
+        "Saber",
+        1.37
+      ],
+      [
+        "Natalia",
+        1.26
+      ],
+      [
+        "Carmilla",
+        1.09
+      ],
+      [
+        "Minsitthar",
+        0.78
+      ],
+      [
+        "Helcurt",
+        0.75
+      ]
+    ]
+  },
+  "counterByRole": {
+    "ASSASSIN": [
+      [
+        "Cyclops",
+        0.85
+      ],
+      [
+        "Saber",
+        0.81
+      ],
+      [
+        "Chip",
+        0.66
+      ],
+      [
+        "Phoveus",
+        0.63
+      ],
+      [
+        "Mathilda",
+        0.62
+      ]
+    ],
+    "FIGHTER": [
+      [
+        "Marcel",
+        0.38
+      ],
+      [
+        "Yve",
+        0.37
+      ],
+      [
+        "X.Borg",
+        0.35
+      ],
+      [
+        "Mathilda",
+        0.34
+      ],
+      [
+        "Zhuxin",
+        0.32
+      ]
+    ],
+    "MAGE": [
+      [
+        "Helcurt",
+        0.46
+      ],
+      [
+        "Nolan",
+        0.34
+      ],
+      [
+        "Estes",
+        0.3
+      ],
+      [
+        "Harley",
+        0.29
+      ],
+      [
+        "Hayabusa",
+        0.28
+      ]
+    ],
+    "MARKSMAN": [
+      [
+        "Lolita",
+        0.44
+      ],
+      [
+        "Saber",
+        0.4
+      ],
+      [
+        "Arlott",
+        0.36
+      ],
+      [
+        "Lesley",
+        0.36
+      ],
+      [
+        "Moskov",
+        0.35
+      ]
+    ],
+    "SUPPORT": [
+      [
+        "Melissa",
+        0.99
+      ],
+      [
+        "Odette",
+        0.89
+      ],
+      [
+        "Estes",
+        0.8
+      ],
+      [
+        "Yve",
+        0.76
+      ],
+      [
+        "Freya",
+        0.75
+      ]
+    ],
+    "TANK": [
+      [
+        "X.Borg",
+        1.49
+      ],
+      [
+        "Alice",
+        1.22
+      ],
+      [
+        "Zhuxin",
+        1.16
+      ],
+      [
+        "Yve",
+        1.16
+      ],
+      [
+        "Karrie",
+        1.08
+      ]
+    ]
+  },
+  "synergyByRole": {
+    "ASSASSIN": [
+      [
+        "Khufra",
+        0.64
+      ],
+      [
+        "Belerick",
+        0.61
+      ],
+      [
+        "Akai",
+        0.55
+      ],
+      [
+        "Gloo",
+        0.52
+      ],
+      [
+        "Minotaur",
+        0.52
+      ]
+    ],
+    "FIGHTER": [
+      [
+        "Sun",
+        0.6
+      ],
+      [
+        "Layla",
+        0.48
+      ],
+      [
+        "Bane",
+        0.46
+      ],
+      [
+        "X.Borg",
+        0.44
+      ],
+      [
+        "Aurora",
+        0.43
+      ]
+    ],
+    "MAGE": [
+      [
+        "Harley",
+        0.67
+      ],
+      [
+        "Granger",
+        0.44
+      ],
+      [
+        "Freya",
+        0.41
+      ],
+      [
+        "Miya",
+        0.4
+      ],
+      [
+        "Marcel",
+        0.39
+      ]
+    ],
+    "MARKSMAN": [
+      [
+        "Harith",
+        1.42
+      ],
+      [
+        "Popol and Kupa",
+        0.99
+      ],
+      [
+        "Kimmy",
+        0.49
+      ],
+      [
+        "Roger",
+        0.49
+      ],
+      [
+        "Floryn",
+        0.46
+      ]
+    ],
+    "SUPPORT": [
+      [
+        "Carmilla",
+        2.1
+      ],
+      [
+        "Saber",
+        1.53
+      ],
+      [
+        "Atlas",
+        1.42
+      ],
+      [
+        "Natalia",
+        1.13
+      ],
+      [
+        "Edith",
+        0.92
+      ]
+    ],
+    "TANK": [
+      [
+        "Natalia",
+        1.22
+      ],
+      [
+        "Helcurt",
+        1.01
+      ],
+      [
+        "Saber",
+        1.0
+      ],
+      [
+        "Angela",
+        0.79
+      ],
+      [
+        "Rafaela",
+        null
+      ]
+    ]
+  }
 }
