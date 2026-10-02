@@ -1,6 +1,10 @@
 package com.mlbbdrafter
 
 import android.app.AlertDialog
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -9,8 +13,12 @@ import android.graphics.Color
 import android.graphics.PixelFormat
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
+import android.os.Build
 import android.os.IBinder
+import android.os.Handler
+import android.os.Looper
 import android.provider.Settings
+import androidx.core.app.NotificationCompat
 import android.view.ContextThemeWrapper
 import android.view.Gravity
 import android.view.MotionEvent
@@ -34,6 +42,9 @@ class OverlayService : Service() {
     private lateinit var ds: Dataset
     private lateinit var prefs: SharedPreferences
     private val d = Draft()
+    private val mainHandler = Handler(Looper.getMainLooper())
+    private var refreshPosted = false
+    private var destroyed = false
 
     private val neon = Color.parseColor("#55FF78")
     private val neonDim = Color.parseColor("#27A84C")
@@ -45,10 +56,55 @@ class OverlayService : Service() {
     private val amber = Color.parseColor("#FFD166")
 
     override fun onBind(i: Intent?): IBinder? = null
+
+    private fun startPersistentNotification() {
+        val channelId = "mlbb_overlay"
+        val nm = getSystemService(NotificationManager::class.java)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            nm.createNotificationChannel(
+                NotificationChannel(
+                    channelId,
+                    "MLBB AI Drafter",
+                    NotificationManager.IMPORTANCE_LOW
+                ).apply {
+                    description = "Keeps the MLBB draft overlay active while gaming"
+                    setShowBadge(false)
+                }
+            )
+        }
+        val launch = packageManager.getLaunchIntentForPackage(packageName)
+        val pending = launch?.let {
+            PendingIntent.getActivity(
+                this, 0, it,
+                PendingIntent.FLAG_UPDATE_CURRENT or
+                    (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0)
+            )
+        }
+        val notification = NotificationCompat.Builder(this, channelId)
+            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setContentTitle("MLBB AI Lineup Drafter")
+            .setContentText("Draft overlay active")
+            .setOngoing(true)
+            .setCategory(NotificationCompat.CATEGORY_SERVICE)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .apply { if (pending != null) setContentIntent(pending) }
+            .build()
+        startForeground(1001, notification)
+    }
+
     private fun dp(v: Int) = (v * resources.displayMetrics.density).toInt()
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        return START_STICKY
+    }
 
     override fun onCreate() {
         super.onCreate()
+        // Keep the overlay alive when the user switches from the drafter to MLBB.
+        // Without a foreground service, Android can stop a background service as soon
+        // as the launcher activity loses the foreground, making the overlay disappear
+        // or the process appear to crash.
+        startPersistentNotification()
         if (!Settings.canDrawOverlays(this)) {
             stopSelf()
             return
@@ -72,12 +128,15 @@ class OverlayService : Service() {
         }
 
         build()
-        wm.addView(root, lp)
-        refresh()
+        runCatching { wm.addView(root, lp) }
+            .onFailure { stopSelf() }
+        if (::root.isInitialized) refresh()
     }
 
     override fun onDestroy() {
-        if (::root.isInitialized) runCatching { wm.removeView(root) }
+        destroyed = true
+        mainHandler.removeCallbacksAndMessages(null)
+        if (::root.isInitialized) runCatching { wm.removeViewImmediate(root) }
         super.onDestroy()
     }
 
@@ -125,7 +184,7 @@ class OverlayService : Service() {
     private fun slot(text: String, onClick: (() -> Unit)? = null): TextView {
         return TextView(this).apply {
             this.text = text
-            mono(this, 8.5f, if (text == "[  ]") muted else white)
+            mono(this, 8.0f, if (text == "[  ]") muted else white)
             gravity = Gravity.CENTER
             setPadding(dp(2), 0, dp(2), 0)
             background = box(Color.parseColor("#A60C1510"), neonDim, 3f)
@@ -162,7 +221,7 @@ class OverlayService : Service() {
                     lp.x = ox + (e.rawX - sx).toInt()
                     lp.y = oy + (e.rawY - sy).toInt()
                     clampPosition()
-                    wm.updateViewLayout(root, lp)
+                    runCatching { wm.updateViewLayout(root, lp) }
                 }
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                     clampPosition()
@@ -197,7 +256,7 @@ class OverlayService : Service() {
         mini.visibility = if (m) View.VISIBLE else View.GONE
         lp.width = if (m) WindowManager.LayoutParams.WRAP_CONTENT else prefs.getInt("w", dp(290))
         lp.height = if (m) WindowManager.LayoutParams.WRAP_CONTENT else prefs.getInt("h", dp(470))
-        wm.updateViewLayout(root, lp)
+        runCatching { wm.updateViewLayout(root, lp) }
     }
 
     private fun build() {
@@ -287,7 +346,7 @@ class OverlayService : Service() {
                     lp.width = (w0 + (e.rawX - sx).toInt()).coerceAtLeast(dp(270))
                     lp.height = (h0 + (e.rawY - sy).toInt()).coerceAtLeast(dp(400))
                     clampPosition()
-                    wm.updateViewLayout(root, lp)
+                    runCatching { wm.updateViewLayout(root, lp) }
                 }
                 MotionEvent.ACTION_UP -> {
                     clampPosition()
@@ -312,6 +371,21 @@ class OverlayService : Service() {
         root.addView(mini)
     }
 
+    private fun heroDisplayName(id: String?): String {
+        if (id.isNullOrBlank()) return ""
+        val key = id.trim()
+        ds.heroes[key]?.name?.let { return it }
+        ds.heroes.values.firstOrNull { it.id.equals(key, ignoreCase = true) }?.name?.let { return it }
+        ds.heroes.values.firstOrNull { it.name.equals(key, ignoreCase = true) }?.name?.let { return it }
+        return key
+    }
+
+    private fun slotName(id: String?): String {
+        if (id.isNullOrBlank()) return "[  ]"
+        val name = heroDisplayName(id)
+        return "[${name.take(11)}]"
+    }
+
     private fun banRow(list: List<String>, title: String): LinearLayout {
         val r = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
@@ -320,7 +394,7 @@ class OverlayService : Service() {
         }
         for (i in 0 until 5) {
             val id = list.getOrNull(i)
-            val name = if (id == null) "[  ]" else "[${ds.heroes[id]?.name?.take(8) ?: id.take(8)}]"
+            val name = slotName(id)
             r.addView(
                 slot(name) {
                     if (i == list.size && list.size < 5) pick(title, if (title.startsWith("Ally")) d.allyBans else d.enemyBans)
@@ -338,7 +412,7 @@ class OverlayService : Service() {
         }
         for (i in 0 until 5) {
             val id = list.getOrNull(i)
-            val name = if (id == null) "[  ]" else "[${ds.heroes[id]?.name?.take(8) ?: id.take(8)}]"
+            val name = slotName(id)
             r.addView(slot(name) {
                 if (i == list.size && list.size < 5) {
                     pick(title, if (title.startsWith("Ally")) d.allyPicks else d.enemyPicks)
@@ -353,6 +427,17 @@ class OverlayService : Service() {
     }
 
     private fun refresh() {
+        if (destroyed || !::content.isInitialized) return
+        if (refreshPosted) return
+        refreshPosted = true
+        mainHandler.post {
+            refreshPosted = false
+            if (destroyed || !::content.isInitialized) return@post
+            refreshNow()
+        }
+    }
+
+    private fun refreshNow() {
         content.removeAllViews()
 
         addSectionHeader(content, "ALLY PICKS")
@@ -530,12 +615,18 @@ class OverlayService : Service() {
 
             quick.addView(quickButton("★ RANK PICK", mainHero, neon).apply {
                 setOnClickListener {
-                    mainHero?.let { d.add(target, it.id); refresh(); dialogRef?.dismiss() }
+                    mainHero?.let { hero ->
+                        runCatching { d.add(target, hero.id) }
+                            .onSuccess { dialogRef?.dismiss(); refresh() }
+                    }
                 }
             })
             quick.addView(quickButton("◎ TOURNAMENT PICK", tournamentHero, amber).apply {
                 setOnClickListener {
-                    tournamentHero?.let { d.add(target, it.id); refresh(); dialogRef?.dismiss() }
+                    tournamentHero?.let { hero ->
+                        runCatching { d.add(target, hero.id) }
+                            .onSuccess { dialogRef?.dismiss(); refresh() }
+                    }
                 }
             })
             wrap.addView(quick, LinearLayout.LayoutParams(-1, dp(48)))
@@ -577,10 +668,10 @@ class OverlayService : Service() {
                 }
             }
             list.setOnItemClickListener { _, _, position, _ ->
+                if (position !in items.indices) return@setOnItemClickListener
                 val chosen = items[position]
-                d.add(target, chosen.id)
-                refresh()
-                dialogRef?.dismiss()
+                runCatching { d.add(target, chosen.id) }
+                    .onSuccess { dialogRef?.dismiss(); refresh() }
             }
         }
 
@@ -601,15 +692,21 @@ class OverlayService : Service() {
             .create()
 
         dialogRef = dialog
-        render(available)
-        dialog.window?.setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY)
         dialog.setOnShowListener {
-            search.requestFocus()
-            dialog.window?.setSoftInputMode(
-                android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE
-            )
+            // Set the overlay window type only after the dialog has a real window.
+            runCatching {
+                dialog.window?.setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY)
+                dialog.window?.setSoftInputMode(
+                    android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN
+                )
+            }
         }
-        dialog.show()
+        runCatching {
+            dialog.show()
+            render(available)
+        }.onFailure {
+            dialogRef = null
+        }
     }
 
     private var dialogRef: AlertDialog? = null

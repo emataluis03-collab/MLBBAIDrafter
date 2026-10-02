@@ -78,21 +78,47 @@ object Engine {
         return combine(c, raw, w).take(5)
     }
 
-    /** Estimate from supplied data only; null when no usable data. */
+    /**
+     * Estimate from the supplied hero win-rate data, and pairwise matchup data when it
+     * actually exists.  Do not turn a raw 59.4% hero win rate into an arbitrary
+     * "59.4 / (59.4 + 50)" probability.  With only one side drafted, the displayed
+     * value follows that side's supplied average win rate; with both sides drafted,
+     * the difference between the two supplied team averages is centered around 50/50.
+     */
     fun prob(ds: Dataset, d: Draft): Prob? {
-        fun side(own: List<String>, opp: List<String>, label: String): Pair<Double?, List<String>> {
-            val sig = mutableListOf<Double>(); val n = mutableListOf<String>()
-            val wrs = own.mapNotNull { ds.heroes[it]?.winRate }
-            avg(wrs)?.let { sig += it; n += "$label avg hero win rate ${"%.1f".format(it)}" }
-            val sy = mutableListOf<Double>()
-            for (i in own.indices) for (j in i + 1 until own.size) ds.syn(own[i], own[j])?.let { sy += it }
-            avg(sy)?.let { sig += it; n += "$label synergy ${"%.1f".format(it)}" }
-            avg(own.flatMap { a -> opp.mapNotNull { ds.mu(a, it) } })?.let { sig += it; n += "$label matchups ${"%.1f".format(it)}" }
-            return avg(sig) to n
+        val allyWrs = d.allyPicks.mapNotNull { ds.heroes[it]?.winRate }
+        val enemyWrs = d.enemyPicks.mapNotNull { ds.heroes[it]?.winRate }
+        val notes = mutableListOf<String>()
+
+        val allyWr = avg(allyWrs)
+        val enemyWr = avg(enemyWrs)
+
+        // Pairwise data, if present in the imported dataset, is stronger evidence than
+        // the aggregate hero averages. It is deliberately ignored when unavailable.
+        val allyMatchups = d.allyPicks.flatMap { a ->
+            d.enemyPicks.mapNotNull { b -> ds.mu(a, b) }
         }
-        val (a, an) = side(d.allyPicks, d.enemyPicks, "Ally")
-        val (e, en) = side(d.enemyPicks, d.allyPicks, "Enemy")
-        if (a == null || e == null) return null
-        return Prob(a / (a + e) * 100, an + en)
+        val enemyMatchups = d.enemyPicks.flatMap { e ->
+            d.allyPicks.mapNotNull { a -> ds.mu(e, a) }
+        }
+        val allyMu = avg(allyMatchups)
+        val enemyMu = avg(enemyMatchups)
+
+        val allyBase = allyMu ?: allyWr
+        val enemyBase = enemyMu ?: enemyWr
+        if (allyBase == null && enemyBase == null) return null
+
+        if (allyWr != null) notes += "Ally supplied avg hero win rate ${"%.2f".format(allyWr)}%"
+        if (enemyWr != null) notes += "Enemy supplied avg hero win rate ${"%.2f".format(enemyWr)}%"
+        if (allyMu != null) notes += "Ally supplied matchup avg ${"%.2f".format(allyMu)}%"
+        if (enemyMu != null) notes += "Enemy supplied matchup avg ${"%.2f".format(enemyMu)}%"
+
+        val ally = when {
+            allyBase != null && enemyBase != null -> 50.0 + (allyBase - enemyBase) / 2.0
+            allyBase != null -> allyBase
+            else -> 100.0 - enemyBase!!
+        }.coerceIn(0.0, 100.0)
+
+        return Prob(ally, notes)
     }
 }
