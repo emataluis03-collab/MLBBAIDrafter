@@ -28,7 +28,16 @@ jobs:
             echo "::error::$DIR/app/build.gradle.kts is missing. The app folder was not uploaded."
             exit 1
           fi
+          if [ ! -f "$DIR/build.gradle.kts" ]; then
+            echo "::error::$DIR/build.gradle.kts (ROOT build file) is missing. It declares the Android plugin versions and must sit next to settings.gradle.kts."
+            exit 1
+          fi
+          echo "===== settings.gradle.kts ====="
           cat "$DIR/settings.gradle.kts"
+          echo "===== build.gradle.kts (root) ====="
+          cat "$DIR/build.gradle.kts"
+          echo "===== app/build.gradle.kts ====="
+          cat "$DIR/app/build.gradle.kts"
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
