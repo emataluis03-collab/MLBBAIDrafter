@@ -88,7 +88,7 @@ class MainActivity : ComponentActivity() {
             })
             addView(b("2. Import dataset (JSON)", amber) { importer.launch(arrayOf("*/*")) })
             addView(b("3. Start overlay") {
-                if (Settings.canDrawOverlays(this@MainActivity)) startService(Intent(this@MainActivity, OverlayService::class.java))
+                if (Settings.canDrawOverlays(this@MainActivity)) startForegroundService(Intent(this@MainActivity, OverlayService::class.java))
                 else toast("Grant overlay permission first")
             })
             addView(b("Stop overlay", red) { stopService(Intent(this@MainActivity, OverlayService::class.java)) })
@@ -126,6 +126,9 @@ class MainActivity : ComponentActivity() {
 
         setContentView(ScrollView(this).apply { setBackgroundColor(bg); addView(col) })
         status()
+        if (android.os.Build.VERSION.SDK_INT >= 33 &&
+            checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED
+        ) requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 1)
     }
 
     private fun status() {

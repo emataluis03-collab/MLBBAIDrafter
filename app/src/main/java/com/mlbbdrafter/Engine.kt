@@ -40,6 +40,34 @@ class Draft {
     }
 
     fun clear() { snapshot(); s = fresh() }
+
+    /** Saved so the draft survives the overlay being restarted by the system. */
+    fun toJson(): String {
+        val o = org.json.JSONObject()
+        Slot.values().forEach { k ->
+            val a = org.json.JSONArray()
+            s[k]!!.forEach { a.put(it ?: "") }
+            o.put(k.name, a)
+        }
+        return o.toString()
+    }
+
+    fun fromJson(text: String?, valid: (String) -> Boolean) {
+        if (text == null) return
+        try {
+            val o = org.json.JSONObject(text)
+            val n = fresh()
+            Slot.values().forEach { k ->
+                val a = o.optJSONArray(k.name) ?: return@forEach
+                for (i in 0 until minOf(5, a.length())) {
+                    val v = a.optString(i, "")
+                    if (v.isNotEmpty() && valid(v)) n[k]!![i] = v
+                }
+            }
+            s = n
+            history.clear()
+        } catch (_: Exception) { }
+    }
 }
 
 data class Scored(val hero: Hero, val score: Double, val incomplete: Boolean, val why: List<String>)
