@@ -13,13 +13,18 @@ data class Hero(
     val roleWr: Map<String, Double>, val personal: Double?,
     val metaScore: Double? = null, val firstPickScore: Double? = null,
     val tournamentTier: String? = null, val laneRankScore: Map<String, Double> = emptyMap(),
-    val synergyScore: Double? = null, val counterScore: Double? = null
+    val synergyScore: Double? = null, val counterScore: Double? = null,
+    val rankTier: String? = null, val rankWinRate: Double? = null, val rankBanRate: Double? = null, val rankPickRate: Double? = null
 )
 data class PairStat(val a: String, val b: String, val wr: Double, val games: Int?)
 
 class Dataset(
     val heroes: Map<String, Hero>, matchups: List<PairStat>, synergies: List<PairStat>,
-    val warnings: List<String>, val label: String
+    val warnings: List<String>, val label: String,
+    val counterByLane: Map<String, List<Pair<String, Double>>> = emptyMap(),
+    val synergyByLane: Map<String, List<Pair<String, Double>>> = emptyMap(),
+    val counterByRole: Map<String, List<Pair<String, Double>>> = emptyMap(),
+    val synergyByRole: Map<String, List<Pair<String, Double>>> = emptyMap()
 ) {
     private val m = HashMap<String, Double>()
     private val s = HashMap<String, Double>()
@@ -62,7 +67,11 @@ object DataImporter {
                 o.optString("tournamentTier", "").ifBlank { null },
                 buildMap { o.optJSONObject("laneRankScore")?.let { lr -> lr.keys().forEach { k -> put(k.uppercase(), lr.optDouble(k)) } } },
                 if (o.has("synergyScore") && !o.isNull("synergyScore")) o.optDouble("synergyScore") else null,
-                if (o.has("counterScore") && !o.isNull("counterScore")) o.optDouble("counterScore") else null)
+                if (o.has("counterScore") && !o.isNull("counterScore")) o.optDouble("counterScore") else null,
+                o.optJSONObject("rankStats")?.optString("tier", "")?.ifBlank { null },
+                o.optJSONObject("rankStats")?.let { if (it.has("winRate")) it.optDouble("winRate") else null },
+                o.optJSONObject("rankStats")?.let { if (it.has("banRate")) it.optDouble("banRate") else null },
+                o.optJSONObject("rankStats")?.let { if (it.has("pickRate")) it.optDouble("pickRate") else null })
         }
         fun pairs(key: String): List<PairStat> {
             val a = root.optJSONArray(key) ?: return emptyList()
@@ -81,10 +90,26 @@ object DataImporter {
             return out
         }
         val mu = pairs("matchups"); val sy = pairs("synergies")
+        fun rankedMap(key: String): Map<String, List<Pair<String, Double>>> {
+            val out = mutableMapOf<String, List<Pair<String, Double>>>()
+            root.optJSONObject(key)?.let { obj ->
+                obj.keys().forEach { lane ->
+                    val a = obj.optJSONArray(lane) ?: return@forEach
+                    out[lane.uppercase()] = (0 until a.length()).mapNotNull { i ->
+                        val pair = a.optJSONArray(i) ?: return@mapNotNull null
+                        if (pair.length() < 2) return@mapNotNull null
+                        pair.optString(0).takeIf { it.isNotBlank() }?.let { it to pair.optDouble(1) }
+                    }
+                }
+            }
+            return out
+        }
         // The bundled user dataset contains aggregate matchup/synergy rankings rather
         // than a full pairwise matrix. Do not label that intentional structure as missing data.
         if (heroes.isEmpty()) w += "No heroes found"
-        return Dataset(heroes, mu, sy, w, root.optString("label", "User data"))
+        return Dataset(heroes, mu, sy, w, root.optString("label", "User data"),
+            rankedMap("counterByLane"), rankedMap("synergyByLane"),
+            rankedMap("counterByRole"), rankedMap("synergyByRole"))
     }
 }
 
@@ -98,7 +123,7 @@ object Store {
 }
 
 object SettingsManager {
-    val PICK = linkedMapOf("synergy" to 30.0, "counter" to 30.0, "winRate" to 20.0, "pickRate" to 10.0, "personal" to 10.0)
+    val PICK = linkedMapOf("synergy" to 25.0, "counter" to 25.0, "winRate" to 20.0, "laneRank" to 15.0, "roleWinRate" to 5.0, "pickRate" to 5.0, "personal" to 5.0)
     val BAN = linkedMapOf("threat" to 30.0, "counter" to 25.0, "enemySynergy" to 20.0, "winRate" to 15.0, "banRate" to 10.0)
     private fun p(c: Context) = c.getSharedPreferences("weights", 0)
     fun pick(c: Context): Map<String, Double> = PICK.mapValues { p(c).getFloat("pick_${it.key}", it.value.toFloat()).toDouble() }

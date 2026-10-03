@@ -11,10 +11,17 @@ import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.os.IBinder
 import android.provider.Settings
+import android.text.Spanned
+import android.text.SpannableStringBuilder
+import android.text.TextUtils
+import android.text.style.ForegroundColorSpan
+import android.text.style.RelativeSizeSpan
+import android.text.style.StyleSpan
 import android.view.ContextThemeWrapper
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.*
 import kotlin.math.abs
@@ -26,23 +33,35 @@ class OverlayService : Service() {
     private lateinit var panel: LinearLayout
     private lateinit var mini: TextView
     private lateinit var content: LinearLayout
-    private lateinit var summary: LinearLayout
-    private lateinit var barA: View
-    private lateinit var barE: View
-    private lateinit var probA: TextView
-    private lateinit var probE: TextView
     private lateinit var ds: Dataset
     private lateinit var prefs: SharedPreferences
     private val d = Draft()
+    private var dialogRef: AlertDialog? = null
+    private var defW = 0
+    private var defH = 0
 
-    private val neon = Color.parseColor("#55FF78")
-    private val neonDim = Color.parseColor("#27A84C")
-    private val bg = Color.parseColor("#E9080D12")
-    private val card = Color.parseColor("#C9131A18")
-    private val white = Color.parseColor("#E9F7EC")
-    private val muted = Color.parseColor("#83A78B")
-    private val red = Color.parseColor("#FF5265")
-    private val amber = Color.parseColor("#FFD166")
+    // ---- palette -------------------------------------------------------------------------
+    private val neon = Color.parseColor("#4DFF88")
+    private val neonDim = Color.parseColor("#1F8F4A")
+    private val bg = Color.parseColor("#F00A0F14")
+    private val cardBg = Color.parseColor("#E6131B22")
+    private val slotEmpty = Color.parseColor("#80182028")
+    private val slotFilled = Color.parseColor("#E61B2A24")
+    private val white = Color.parseColor("#EAF4EE")
+    private val muted = Color.parseColor("#7E9488")
+    private val red = Color.parseColor("#FF5A6E")
+    private val amber = Color.parseColor("#FFC857")
+    private val blue = Color.parseColor("#5EB6FF")
+    private val hairline = Color.parseColor("#33FFFFFF")
+
+    private val laneColor = mapOf(
+        "EXP" to Color.parseColor("#FF8A5B"),
+        "JUNGLE" to Color.parseColor("#7BE26B"),
+        "MID" to Color.parseColor("#6FB7FF"),
+        "GOLD" to Color.parseColor("#FFD166"),
+        "ROAM" to Color.parseColor("#C58CFF")
+    )
+    private fun short(role: String) = when (role) { "JUNGLE" -> "JG"; "GOLD" -> "GLD"; else -> role }
 
     override fun onBind(i: Intent?): IBinder? = null
     private fun dp(v: Int) = (v * resources.displayMetrics.density).toInt()
@@ -58,89 +77,124 @@ class OverlayService : Service() {
         wm = getSystemService(WINDOW_SERVICE) as WindowManager
         ds = Store.load(this)
 
+        val dm = resources.displayMetrics
+        defW = minOf(dp(340), dm.widthPixels - dp(8))
+        defH = minOf(dp(600), dm.heightPixels - dp(70))
+
         lp = WindowManager.LayoutParams(
-            prefs.getInt("w", dp(290)),
-            prefs.getInt("h", dp(470)),
+            prefs.getInt("w2", defW),
+            prefs.getInt("h2", defH),
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
                 WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
             PixelFormat.TRANSLUCENT
         ).apply {
             gravity = Gravity.TOP or Gravity.START
-            x = prefs.getInt("x", dp(8))
-            y = prefs.getInt("y", dp(55))
+            x = prefs.getInt("x", dp(4))
+            y = prefs.getInt("y", dp(40))
         }
 
         build()
+        clampPosition()
         wm.addView(root, lp)
         refresh()
     }
 
     override fun onDestroy() {
+        runCatching { dialogRef?.dismiss() }
         if (::root.isInitialized) runCatching { wm.removeView(root) }
         super.onDestroy()
     }
 
-    private fun mono(v: TextView, size: Float = 11f, color: Int = white) {
-        v.typeface = Typeface.create(Typeface.MONOSPACE, Typeface.NORMAL)
-        v.textSize = size
-        v.setTextColor(color)
-    }
+    // ---- small view helpers --------------------------------------------------------------
+    private fun tv(text: CharSequence, size: Float = 11f, color: Int = white, bold: Boolean = false) =
+        TextView(this).apply {
+            this.text = text
+            textSize = size
+            setTextColor(color)
+            typeface = Typeface.create("sans-serif-medium", if (bold) Typeface.BOLD else Typeface.NORMAL)
+            gravity = Gravity.CENTER_VERTICAL
+            includeFontPadding = false
+        }
 
-    private fun label(
-        text: String,
-        size: Float = 10f,
-        color: Int = muted,
-        bold: Boolean = false
-    ) = TextView(this).apply {
-        this.text = text
-        this.textSize = size
-        this.setTextColor(color)
-        this.typeface = Typeface.create(Typeface.MONOSPACE, if (bold) Typeface.BOLD else Typeface.NORMAL)
-        this.gravity = Gravity.CENTER_VERTICAL
-    }
-
-    private fun box(color: Int = card, stroke: Int = Color.TRANSPARENT, radius: Float = 4f) =
+    private fun box(color: Int = cardBg, stroke: Int = Color.TRANSPARENT, radius: Float = 8f) =
         GradientDrawable().apply {
             setColor(color)
             if (stroke != Color.TRANSPARENT) setStroke(dp(1), stroke)
             cornerRadius = dp(radius.toInt()).toFloat()
         }
 
-    private fun row(vararg views: View, height: Int = -2) = LinearLayout(this).apply {
+    private fun hRow(h: Int = -2) = LinearLayout(this).apply {
         orientation = LinearLayout.HORIZONTAL
         gravity = Gravity.CENTER_VERTICAL
-        views.forEach { addView(it) }
-        layoutParams = LinearLayout.LayoutParams(-1, if (height == -2) LinearLayout.LayoutParams.WRAP_CONTENT else dp(height))
+        layoutParams = LinearLayout.LayoutParams(-1, if (h == -2) ViewGroup.LayoutParams.WRAP_CONTENT else dp(h))
     }
 
-    private fun sectionTitle(text: String) = TextView(this).apply {
-        this.text = text
-        mono(this, 9f, neon)
-        gravity = Gravity.CENTER
-        setPadding(0, dp(3), 0, dp(2))
-        letterSpacing = 0.08f
+    private fun weighted(h: Int, mx: Int = 2) = LinearLayout.LayoutParams(0, dp(h), 1f).apply {
+        marginStart = dp(mx); marginEnd = dp(mx)
     }
 
-    private fun slot(text: String, onClick: (() -> Unit)? = null): TextView {
-        return TextView(this).apply {
-            this.text = text
-            mono(this, 8.5f, if (text == "[  ]") muted else white)
-            gravity = Gravity.CENTER
-            setPadding(dp(2), 0, dp(2), 0)
-            background = box(Color.parseColor("#A60C1510"), neonDim, 3f)
-            layoutParams = LinearLayout.LayoutParams(0, dp(28), 1f).apply {
-                marginStart = dp(2)
-                marginEnd = dp(2)
-            }
-            if (onClick != null) setOnClickListener { onClick() }
+    private fun spacer(h: Int) = View(this).apply { layoutParams = LinearLayout.LayoutParams(-1, dp(h)) }
+
+    /** Rounded section card with a coloured title. */
+    private fun card(title: String, accent: Int = neon, subtitle: String? = null, fill: LinearLayout.() -> Unit): LinearLayout {
+        val c = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(8), dp(7), dp(8), dp(8))
+            background = box(cardBg, hairline, 12f)
+            layoutParams = LinearLayout.LayoutParams(-1, -2).apply { bottomMargin = dp(8) }
         }
+        val head = hRow()
+        head.addView(tv(title, 11f, accent, true).apply { letterSpacing = 0.08f })
+        if (subtitle != null) head.addView(tv(subtitle, 9f, muted).apply {
+            gravity = Gravity.END or Gravity.CENTER_VERTICAL
+            layoutParams = LinearLayout.LayoutParams(0, -2, 1f)
+        })
+        c.addView(head)
+        c.addView(spacer(5))
+        c.fill()
+        return c
     }
 
+    private fun smallLabel(text: String, color: Int = muted) = tv(text, 9f, color, true).apply {
+        setPadding(dp(2), dp(2), 0, dp(2))
+    }
+
+    private fun button(text: String, accent: Int = neon, onClick: () -> Unit) = tv(text, 11f, accent, true).apply {
+        gravity = Gravity.CENTER
+        background = box(Color.parseColor("#33" + String.format("%06X", accent and 0xFFFFFF)), accent, 10f)
+        layoutParams = weighted(36)
+        setOnClickListener { onClick() }
+    }
+
+    /** Two-line tappable chip: hero name + small sub-text. */
+    private fun chip(name: String, sub: String, accent: Int, onClick: () -> Unit) = TextView(this).apply {
+        val sb = SpannableStringBuilder(name)
+        sb.setSpan(StyleSpan(Typeface.BOLD), 0, sb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        sb.append("\n")
+        val st = sb.length
+        sb.append(sub)
+        sb.setSpan(RelativeSizeSpan(0.8f), st, sb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        sb.setSpan(ForegroundColorSpan(muted), st, sb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        text = sb
+        textSize = 11f
+        setTextColor(white)
+        gravity = Gravity.CENTER
+        maxLines = 2
+        ellipsize = TextUtils.TruncateAt.END
+        setPadding(dp(3), dp(2), dp(3), dp(2))
+        background = box(Color.parseColor("#26" + String.format("%06X", accent and 0xFFFFFF)), accent, 9f)
+        layoutParams = weighted(46)
+        setOnClickListener { onClick() }
+    }
+
+    private fun toast(s: String) = Toast.makeText(this, s, Toast.LENGTH_SHORT).show()
+
+    // ---- window drag / resize ------------------------------------------------------------
     private fun clampPosition() {
         val dm = resources.displayMetrics
-        val left = dp(4)
-        val top = dp(30)
+        val left = dp(2)
+        val top = dp(24)
         val maxX = (dm.widthPixels - lp.width - left).coerceAtLeast(left)
         val maxY = (dm.heightPixels - lp.height - dp(4)).coerceAtLeast(top)
         lp.x = lp.x.coerceIn(left, maxX)
@@ -153,44 +207,26 @@ class OverlayService : Service() {
     }
 
     private fun drag(v: View, onTap: (() -> Unit)? = null) {
-        var ox = 0
-        var oy = 0
-        var sx = 0f
-        var sy = 0f
-        var moved = false
+        var ox = 0; var oy = 0; var sx = 0f; var sy = 0f; var moved = false
         v.setOnTouchListener { _, e ->
             when (e.actionMasked) {
-                MotionEvent.ACTION_DOWN -> {
-                    ox = lp.x
-                    oy = lp.y
-                    sx = e.rawX
-                    sy = e.rawY
-                    moved = false
-                    true
-                }
+                MotionEvent.ACTION_DOWN -> { ox = lp.x; oy = lp.y; sx = e.rawX; sy = e.rawY; moved = false; true }
                 MotionEvent.ACTION_MOVE -> {
                     val nx = ox + (e.rawX - sx).toInt()
                     val ny = oy + (e.rawY - sy).toInt()
                     if (abs(nx - ox) >= 1 || abs(ny - oy) >= 1) moved = true
-                    lp.x = nx
-                    lp.y = ny
-                    clampPosition()
-                    updateOverlayLayout()
+                    lp.x = nx; lp.y = ny
+                    clampPosition(); updateOverlayLayout()
                     true
                 }
                 MotionEvent.ACTION_UP -> {
-                    clampPosition()
-                    updateOverlayLayout()
+                    clampPosition(); updateOverlayLayout()
                     prefs.edit().putInt("x", lp.x).putInt("y", lp.y).apply()
-                    if (onTap != null && !moved &&
-                        abs(e.rawX - sx) < dp(10) &&
-                        abs(e.rawY - sy) < dp(10)
-                    ) onTap()
+                    if (onTap != null && !moved && abs(e.rawX - sx) < dp(10) && abs(e.rawY - sy) < dp(10)) onTap()
                     true
                 }
                 MotionEvent.ACTION_CANCEL -> {
-                    clampPosition()
-                    updateOverlayLayout()
+                    clampPosition(); updateOverlayLayout()
                     prefs.edit().putInt("x", lp.x).putInt("y", lp.y).apply()
                     true
                 }
@@ -199,138 +235,78 @@ class OverlayService : Service() {
         }
     }
 
-    private fun actionButton(text: String, onClick: () -> Unit): TextView {
-        return TextView(this).apply {
-            this.text = text
-            mono(this, 8.5f, neon)
-            gravity = Gravity.CENTER
-            setPadding(dp(5), 0, dp(5), 0)
-            background = box(Color.parseColor("#B20D1711"), neonDim, 3f)
-            layoutParams = LinearLayout.LayoutParams(0, dp(28), 1f).apply {
-                marginStart = dp(2)
-                marginEnd = dp(2)
-            }
-            setOnClickListener { onClick() }
-        }
-    }
-
     private fun setMinimized(m: Boolean) {
         panel.visibility = if (m) View.GONE else View.VISIBLE
         mini.visibility = if (m) View.VISIBLE else View.GONE
-        lp.width = if (m) WindowManager.LayoutParams.WRAP_CONTENT else prefs.getInt("w", dp(290))
-        lp.height = if (m) WindowManager.LayoutParams.WRAP_CONTENT else prefs.getInt("h", dp(470))
+        lp.width = if (m) WindowManager.LayoutParams.WRAP_CONTENT else prefs.getInt("w2", defW)
+        lp.height = if (m) WindowManager.LayoutParams.WRAP_CONTENT else prefs.getInt("h2", defH)
         wm.updateViewLayout(root, lp)
     }
 
     private fun build() {
         root = FrameLayout(this)
-
         panel = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(dp(4), dp(3), dp(4), dp(2))
-            background = box(bg, neon, 3f)
+            setPadding(dp(6), dp(4), dp(6), dp(3))
+            background = box(bg, neonDim, 16f)
         }
 
-        // Compact header: larger touch target for reliable dragging over MLBB.
-        val title = label("[ AI LINEUP DRAFTER ]", 9.5f, neon, true).apply {
+        val title = tv("AI LINEUP DRAFTER", 12f, neon, true).apply {
             gravity = Gravity.CENTER
-            letterSpacing = 0.06f
-            layoutParams = LinearLayout.LayoutParams(0, dp(34), 1f)
+            letterSpacing = 0.1f
+            layoutParams = LinearLayout.LayoutParams(0, dp(38), 1f)
         }
         drag(title)
-
-        val close = TextView(this).apply {
-            text = "×"
-            mono(this, 16f, neon)
+        val min = tv("–", 20f, neon, true).apply {
             gravity = Gravity.CENTER
-            layoutParams = LinearLayout.LayoutParams(dp(34), dp(34))
-            setOnClickListener { stopSelf() }
-        }
-        val min = TextView(this).apply {
-            text = "−"
-            mono(this, 16f, neon)
-            gravity = Gravity.CENTER
-            layoutParams = LinearLayout.LayoutParams(dp(34), dp(34))
+            layoutParams = LinearLayout.LayoutParams(dp(38), dp(38))
             setOnClickListener { setMinimized(true) }
         }
-        panel.addView(row(title, min, close, height = 34))
-
-        val dataLabel = label("DATA  ${ds.label.uppercase()}  •  ${ds.heroes.size} HEROES", 7.0f, muted).apply {
+        val close = tv("×", 20f, red, true).apply {
             gravity = Gravity.CENTER
-            setPadding(0, 0, 0, dp(2))
+            layoutParams = LinearLayout.LayoutParams(dp(38), dp(38))
+            setOnClickListener { stopSelf() }
         }
-        panel.addView(dataLabel)
-
-        panel.addView(sectionTitle("ALLY BANS"))
-        panel.addView(banRow(d.allyBans, "Ally ban"))
-        panel.addView(sectionTitle("ENEMY BANS"))
-        panel.addView(banRow(d.enemyBans, "Enemy ban"))
-
-        val controls = row(
-            actionButton("+ AB") { pick("Ally ban", d.allyBans) },
-            actionButton("+ EB") { pick("Enemy ban", d.enemyBans) },
-            actionButton("UNDO") { d.undo(); refresh() },
-            actionButton("RESET") { d.clear(); refresh() }
-        )
-        panel.addView(controls)
+        panel.addView(hRow(38).apply { addView(title); addView(min); addView(close) })
 
         val scroll = ScrollView(this).apply {
-            isFillViewport = false
             overScrollMode = View.OVER_SCROLL_NEVER
-            clipToPadding = false
-            setPadding(0, dp(2), 0, dp(2))
+            isVerticalScrollBarEnabled = false
         }
         content = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(0, dp(1), 0, dp(8))
+            setPadding(0, dp(2), 0, dp(6))
         }
         scroll.addView(content)
-        // Everything below the draft slots scrolls together. This keeps Ban Priority
-        // and Matchup Probability reachable even on smaller screens.
         panel.addView(scroll, LinearLayout.LayoutParams(-1, 0, 1f))
 
-        val handle = label("≡  DRAG / RESIZE", 7f, muted).apply {
-            gravity = Gravity.CENTER
-            setPadding(0, dp(2), 0, 0)
-        }
-        var w0 = 0
-        var h0 = 0
-        var sx = 0f
-        var sy = 0f
+        val handle = tv("≡  DRAG TO RESIZE  ≡", 9f, muted).apply { gravity = Gravity.CENTER }
+        var w0 = 0; var h0 = 0; var sx = 0f; var sy = 0f
         handle.setOnTouchListener { _, e ->
             when (e.actionMasked) {
-                MotionEvent.ACTION_DOWN -> {
-                    w0 = lp.width
-                    h0 = lp.height
-                    sx = e.rawX
-                    sy = e.rawY
-                }
+                MotionEvent.ACTION_DOWN -> { w0 = lp.width; h0 = lp.height; sx = e.rawX; sy = e.rawY }
                 MotionEvent.ACTION_MOVE -> {
                     val dm = resources.displayMetrics
-                    val maxW = (dm.widthPixels - dp(8)).coerceAtLeast(dp(270))
-                    val maxH = (dm.heightPixels - dp(34)).coerceAtLeast(dp(400))
-                    lp.width = (w0 + (e.rawX - sx).toInt()).coerceIn(dp(270), maxW)
-                    lp.height = (h0 + (e.rawY - sy).toInt()).coerceIn(dp(400), maxH)
-                    clampPosition()
-                    updateOverlayLayout()
+                    val maxW = (dm.widthPixels - dp(8)).coerceAtLeast(dp(300))
+                    val maxH = (dm.heightPixels - dp(34)).coerceAtLeast(dp(420))
+                    lp.width = (w0 + (e.rawX - sx).toInt()).coerceIn(dp(300), maxW)
+                    lp.height = (h0 + (e.rawY - sy).toInt()).coerceIn(dp(420), maxH)
+                    clampPosition(); updateOverlayLayout()
                 }
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                    clampPosition()
-                    updateOverlayLayout()
-                    prefs.edit().putInt("w", lp.width).putInt("h", lp.height).putInt("x", lp.x).putInt("y", lp.y).apply()
+                    clampPosition(); updateOverlayLayout()
+                    prefs.edit().putInt("w2", lp.width).putInt("h2", lp.height).putInt("x", lp.x).putInt("y", lp.y).apply()
                 }
             }
             true
         }
-        panel.addView(handle, LinearLayout.LayoutParams(-1, dp(22)))
+        panel.addView(handle, LinearLayout.LayoutParams(-1, dp(24)))
 
-        mini = TextView(this).apply {
-            text = "AI"
-            mono(this, 11f, neon)
+        mini = tv("AI", 13f, neon, true).apply {
             gravity = Gravity.CENTER
-            setPadding(dp(11), dp(8), dp(11), dp(8))
+            setPadding(dp(14), dp(10), dp(14), dp(10))
             visibility = View.GONE
-            background = box(bg, neon, 20f)
+            background = box(bg, neon, 22f)
         }
         drag(mini) { setMinimized(false) }
 
@@ -338,305 +314,334 @@ class OverlayService : Service() {
         root.addView(mini)
     }
 
-    private fun banRow(list: List<String>, title: String): LinearLayout {
-        val r = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
+    // ---- draft slots ---------------------------------------------------------------------
+    private fun slotView(kind: Slot, i: Int, accent: Int, tall: Boolean, laneTag: String? = null): TextView {
+        val heroId = d.at(kind, i)
+        return TextView(this).apply {
             gravity = Gravity.CENTER
-            layoutParams = LinearLayout.LayoutParams(-1, dp(29))
-        }
-        for (i in 0 until 5) {
-            val id = list.getOrNull(i)
-            val name = if (id == null) "[  ]" else "[${ds.heroes[id]?.name?.take(8) ?: id.take(8)}]"
-            r.addView(
-                slot(name) {
-                    if (i == list.size && list.size < 5) pick(title, if (title.startsWith("Ally")) d.allyBans else d.enemyBans)
+            maxLines = 2
+            ellipsize = TextUtils.TruncateAt.END
+            setPadding(dp(2), 0, dp(2), 0)
+            typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
+            if (heroId == null) {
+                text = "+"
+                textSize = 18f
+                setTextColor(muted)
+                background = box(slotEmpty, hairline, 10f)
+            } else {
+                val sb = SpannableStringBuilder(ds.heroes[heroId]?.name ?: heroId)
+                sb.setSpan(StyleSpan(Typeface.BOLD), 0, sb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                if (laneTag != null) {
+                    sb.append("\n")
+                    val st = sb.length
+                    sb.append(short(laneTag))
+                    sb.setSpan(RelativeSizeSpan(0.78f), st, sb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    sb.setSpan(ForegroundColorSpan(laneColor[laneTag] ?: muted), st, sb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                 }
-            )
+                text = sb
+                textSize = 10.5f
+                setTextColor(white)
+                background = box(slotFilled, accent, 10f)
+            }
+            layoutParams = weighted(if (tall) 44 else 36)
+            setOnClickListener { if (heroId == null) openPicker(kind, i) else openSlotMenu(kind, i) }
         }
-        return r
     }
 
-    private fun pickRow(list: List<String>, title: String): LinearLayout {
-        val r = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER
-            layoutParams = LinearLayout.LayoutParams(-1, dp(28))
-        }
-        for (i in 0 until 5) {
-            val id = list.getOrNull(i)
-            val name = if (id == null) "[  ]" else "[${ds.heroes[id]?.name?.take(8) ?: id.take(8)}]"
-            r.addView(slot(name) {
-                if (i == list.size && list.size < 5) {
-                    pick(title, if (title.startsWith("Ally")) d.allyPicks else d.enemyPicks)
-                }
-            })
-        }
-        return r
+    private fun slotRow(kind: Slot, accent: Int, tall: Boolean, laneOf: Map<String, String> = emptyMap()) =
+        hRow().apply { for (i in 0 until 5) addView(slotView(kind, i, accent, tall, d.at(kind, i)?.let { laneOf[it] })) }
+
+    /** Add to ally picks. If [replaceId] is given, that hero is swapped out instead. */
+    private fun putAllyPick(hero: Hero, replaceId: String? = null) {
+        val idx = if (replaceId != null) (0 until 5).firstOrNull { d.at(Slot.ALLY_PICK, it) == replaceId }
+                  else (0 until 5).firstOrNull { d.at(Slot.ALLY_PICK, it) == null }
+        if (idx == null) { toast("Ally picks are full — tap a slot to change one"); return }
+        d.set(Slot.ALLY_PICK, idx, hero.id)
+        refresh()
     }
 
-    private fun addSectionHeader(parent: LinearLayout, text: String) {
-        parent.addView(sectionTitle(text))
+    private fun putAllyBan(hero: Hero) {
+        if (!d.add(Slot.ALLY_BAN, hero.id)) toast("Ally bans are full — tap a slot to change one") else refresh()
     }
 
+    // ---- main render ---------------------------------------------------------------------
     private fun refresh() {
         content.removeAllViews()
+        val laneOf = Engine.assignLanes(d.allyPicks, ds)
+        val filledByLane = laneOf.entries.associate { it.value to it.key }   // lane -> heroId
 
-        addSectionHeader(content, "ALLY PICKS")
-        content.addView(pickRow(d.allyPicks, "Ally pick"))
-        addSectionHeader(content, "ENEMY PICKS")
-        content.addView(pickRow(d.enemyPicks, "Enemy pick"))
-
-        val pickMap = Engine.picks(ds, d, SettingsManager.pick(this))
-        addSectionHeader(content, ">> OPTIMAL PICK VECTORS <<")
-        val vectorCard = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(dp(3), dp(1), dp(3), dp(2))
-            background = box(card, Color.parseColor("#214F2D"), 4f)
-        }
-        for (role in ROLES) {
-            val scores = pickMap[role].orEmpty()
-            val main = scores.getOrNull(0)
-            val flex = scores.getOrNull(1)
-            val text = if (main == null) "NO DATA" else "${main.hero.name} / ${flex?.hero?.name ?: "—"}"
-            val scoreText = if (main == null) "" else "  ${"%.0f".format(main.score)}"
-            val r = LinearLayout(this).apply {
-                orientation = LinearLayout.HORIZONTAL
-                gravity = Gravity.CENTER_VERTICAL
-                layoutParams = LinearLayout.LayoutParams(-1, dp(24))
-            }
-            r.addView(label(role, 7.8f, neon, true).apply {
-                layoutParams = LinearLayout.LayoutParams(dp(42), -1)
-            })
-            r.addView(label(text + scoreText, 7.8f, white).apply {
-                ellipsize = android.text.TextUtils.TruncateAt.END
-                maxLines = 1
-                layoutParams = LinearLayout.LayoutParams(0, -1, 1f)
-            })
-            vectorCard.addView(r)
-        }
-        content.addView(vectorCard)
-
-        val all = pickMap.values.flatten()
-        val rankPick = all.maxByOrNull { it.score }
-        val tierValue = mapOf("SS" to 6, "S" to 5, "A" to 4, "B" to 3, "C" to 2, "D" to 1)
-        val tournamentPick = ds.heroes.values
-            .filter { it.id !in d.used() && it.tournamentTier != null }
-            .mapNotNull { h ->
-                val tier = tierValue[h.tournamentTier] ?: return@mapNotNull null
-                val roleCount = h.roles.distinct().size
-                val rankScore = all.filter { it.hero.id == h.id }.maxOfOrNull { it.score } ?: 0.0
-                Triple(h, tier, rankScore + roleCount * 0.001)
-            }
-            .maxWithOrNull(compareBy<Triple<Hero, Int, Double>> { it.second }.thenByDescending { it.third })
-
-        addSectionHeader(content, ">> PRIORITY PICKS <<")
-        val priority = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
-            setPadding(dp(1), 0, dp(1), dp(1))
-        }
-        fun priorityCard(title: String, hero: Hero?, subtitle: String, accent: Int): TextView = TextView(this).apply {
-            text = if (hero == null) "$title\nNO DATA\n$subtitle" else "$title\n${hero.name}\n$subtitle"
-            mono(this, 6.8f, white)
+        content.addView(tv("${ds.label.uppercase()}  •  ${ds.heroes.size} HEROES", 8f, muted).apply {
             gravity = Gravity.CENTER
-            setPadding(dp(2), dp(1), dp(2), dp(1))
-            background = box(Color.parseColor("#A6101812"), accent, 3f)
-            layoutParams = LinearLayout.LayoutParams(0, dp(39), 1f).apply {
-                marginStart = dp(2)
-                marginEnd = dp(2)
-            }
-        }
-        priority.addView(priorityCard("★ RANK PICK", rankPick?.hero, if (rankPick == null) "no data" else "score ${"%.0f".format(rankPick.score)}", neon))
-        priority.addView(priorityCard("◎ TOURNAMENT PICK", tournamentPick?.first, if (tournamentPick == null) "no tier data" else "${tournamentPick.first.tournamentTier} TIER", amber))
-        content.addView(priority)
+            setPadding(0, 0, 0, dp(5))
+            maxLines = 1; ellipsize = TextUtils.TruncateAt.END
+        })
 
-        addSectionHeader(content, ">> BAN PRIORITY <<")
-        val bans = Engine.bans(ds, d, SettingsManager.ban(this))
-        if (bans.isEmpty()) {
-            content.addView(label("NO DATA", 7f, muted).apply { gravity = Gravity.CENTER })
-        } else {
-            val banLine = bans.take(3).joinToString("  •  ") { s ->
-                "${s.hero.name} ${"%.0f".format(s.score)}${if (s.incomplete) "*" else ""}"
-            }
-            content.addView(label(banLine, 7f, white).apply {
-                gravity = Gravity.CENTER
-                setPadding(dp(3), 0, dp(3), dp(1))
-                maxLines = 1
-                ellipsize = android.text.TextUtils.TruncateAt.END
+        // BANS
+        content.addView(card("BANS", amber, "tap any slot") {
+            addView(smallLabel("ALLY BANS", neon))
+            addView(slotRow(Slot.ALLY_BAN, neonDim, false))
+            addView(spacer(4))
+            addView(smallLabel("ENEMY BANS", red))
+            addView(slotRow(Slot.ENEMY_BAN, red, false))
+        })
+
+        // PICKS
+        content.addView(card("PICKS", neon, "tap any slot") {
+            addView(smallLabel("ALLY PICKS", neon))
+            addView(slotRow(Slot.ALLY_PICK, neonDim, true, laneOf))
+            addView(spacer(4))
+            addView(smallLabel("ENEMY PICKS", red))
+            addView(slotRow(Slot.ENEMY_PICK, red, true))
+            addView(spacer(6))
+            addView(hRow(36).apply {
+                addView(button("↶ UNDO", amber) { d.undo(); refresh() })
+                addView(button("RESET ALL", red) { d.clear(); refresh() })
             })
-        }
+        })
 
-        addSectionHeader(content, ">> MATCHUP PROBABILITY <<")
+        // SUGGESTIONS PER LANE (every lane, always)
+        val pickMap = Engine.picks(ds, d, SettingsManager.pick(this), 3)
+        content.addView(card("SUGGESTED PICKS PER LANE", neon, "tap to pick") {
+            for (role in ROLES) {
+                val filled = filledByLane[role]
+                val list = pickMap[role].orEmpty()
+                val accent = laneColor[role] ?: neon
+                val head = hRow().apply { setPadding(dp(2), dp(4), 0, dp(3)) }
+                head.addView(tv(role, 11f, accent, true).apply { layoutParams = LinearLayout.LayoutParams(dp(62), -2) })
+                head.addView(
+                    if (filled != null) tv("✓ ${ds.heroes[filled]?.name ?: filled}  •  alternatives", 10f, neon)
+                    else tv("OPEN LANE", 10f, amber, true)
+                )
+                addView(head)
+                if (list.isEmpty()) {
+                    addView(tv("No heroes left in the pool", 10f, muted).apply { setPadding(dp(4), 0, 0, dp(4)) })
+                } else {
+                    addView(hRow().apply {
+                        list.forEach { s ->
+                            val h = s.hero
+                            val wr = (h.rankWinRate ?: h.winRate)?.let { "%.1f%%".format(it) } ?: "—"
+                            addView(chip(h.name, "${"%.0f".format(s.score)} • $wr", accent) { putAllyPick(h, filled) })
+                        }
+                    })
+                }
+            }
+        })
+
+        // PRIORITY PICKS (prefer lanes that are still open)
+        val openRoles = ROLES.filter { it !in filledByLane }
+        val poolMap = if (openRoles.isEmpty()) pickMap else pickMap.filterKeys { it in openRoles }
+        val rankPick = poolMap.values.flatten().maxByOrNull { it.score }
+        val tourPick = tournamentPick(poolMap)
+        content.addView(card("PRIORITY PICKS", amber, if (openRoles.isEmpty()) "all lanes filled" else "open lanes") {
+            addView(hRow().apply {
+                if (rankPick != null) addView(chip(rankPick.hero.name, "★ RANK ${"%.0f".format(rankPick.score)}", neon) { putAllyPick(rankPick.hero) })
+                else addView(chip("—", "★ RANK", neon) { })
+                if (tourPick != null) addView(chip(tourPick.name, "◎ TIER ${tourPick.tournamentTier}", amber) { putAllyPick(tourPick) })
+                else addView(chip("—", "◎ TOURNAMENT", amber) { })
+            })
+        })
+
+        // BAN PRIORITY
+        val bans = Engine.bans(ds, d, SettingsManager.ban(this))
+        content.addView(card("BAN PRIORITY", red, "tap = ally ban") {
+            if (bans.isEmpty()) addView(tv("No heroes left", 10f, muted))
+            else addView(hRow().apply {
+                bans.take(4).forEach { s ->
+                    val br = (s.hero.rankBanRate ?: s.hero.banRate)?.let { "BR %.0f%%".format(it) } ?: "${"%.0f".format(s.score)}"
+                    addView(chip(s.hero.name, br, red) { putAllyBan(s.hero) })
+                }
+            })
+        })
+
+        // WIN PROBABILITY
         val p = Engine.prob(ds, d)
         val a = p?.ally ?: 50.0
         val e = 100.0 - a
-        val probWrap = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(dp(5), dp(1), dp(5), dp(3))
-            background = box(card, Color.parseColor("#214F2D"), 3f)
-        }
-        val probLabels = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
-        probA = label("ALLY  ${"%.1f".format(a)}%", 7.2f, neon, true).apply {
-            layoutParams = LinearLayout.LayoutParams(0, dp(15), 1f)
-        }
-        probE = label("ENEMY  ${"%.1f".format(e)}%", 7.2f, red, true).apply {
-            gravity = Gravity.END
-            layoutParams = LinearLayout.LayoutParams(0, dp(15), 1f)
-        }
-        probLabels.addView(probA); probLabels.addView(probE); probWrap.addView(probLabels)
-        val track = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
-            background = box(Color.parseColor("#3A303838"), Color.TRANSPARENT, 2f)
-            layoutParams = LinearLayout.LayoutParams(-1, dp(6))
-        }
-        barA = View(this).apply { setBackgroundColor(neon); layoutParams = LinearLayout.LayoutParams(0, -1, a.toFloat()) }
-        barE = View(this).apply { setBackgroundColor(red); layoutParams = LinearLayout.LayoutParams(0, -1, e.toFloat()) }
-        track.addView(barA); track.addView(barE); probWrap.addView(track)
-        if (p == null) probWrap.addView(label("No data — add picks with supplied stats.", 6.5f, muted).apply { gravity = Gravity.CENTER })
-        content.addView(probWrap)
+        content.addView(card("MATCHUP PROBABILITY", blue) {
+            addView(hRow().apply {
+                addView(tv("ALLY  ${"%.1f".format(a)}%", 12f, neon, true).apply { layoutParams = LinearLayout.LayoutParams(0, dp(20), 1f) })
+                addView(tv("ENEMY  ${"%.1f".format(e)}%", 12f, red, true).apply {
+                    gravity = Gravity.END or Gravity.CENTER_VERTICAL
+                    layoutParams = LinearLayout.LayoutParams(0, dp(20), 1f)
+                })
+            })
+            addView(LinearLayout(this@OverlayService).apply {
+                orientation = LinearLayout.HORIZONTAL
+                background = box(Color.parseColor("#3A303838"), Color.TRANSPARENT, 4f)
+                layoutParams = LinearLayout.LayoutParams(-1, dp(8))
+                addView(View(this@OverlayService).apply { setBackgroundColor(neon); layoutParams = LinearLayout.LayoutParams(0, -1, a.toFloat()) })
+                addView(View(this@OverlayService).apply { setBackgroundColor(red); layoutParams = LinearLayout.LayoutParams(0, -1, e.toFloat()) })
+            })
+            if (p == null) addView(tv("Add ally AND enemy picks to see the estimate", 9f, muted).apply {
+                gravity = Gravity.CENTER; setPadding(0, dp(4), 0, 0)
+            })
+        })
     }
 
-    /**
-     * Searchable hero picker used by every ban/pick slot.
-     * The user can type a hero name, then tap the exact result.
-     * No game state is read automatically; this only edits the manual draft.
-     */
-    private fun pick(title: String, target: MutableList<String>) {
-        if (target.size >= 5) return
+    private fun tournamentPick(pm: Map<String, List<Scored>>): Hero? {
+        val tierValue = mapOf("SS" to 6, "S" to 5, "A" to 4, "B" to 3, "C" to 2, "D" to 1)
+        val used = d.used().toSet()
+        val scores = pm.values.flatten()
+        return ds.heroes.values
+            .filter { it.id !in used && it.tournamentTier != null }
+            .maxWithOrNull(
+                compareBy<Hero> { h -> h.tournamentTier?.let { t -> tierValue[t] } ?: 0 }
+                    .thenBy { h -> scores.filter { s -> s.hero.id == h.id }.maxOfOrNull { s -> s.score } ?: 0.0 }
+            )
+    }
 
-        val available = ds.heroes.values
-            .filter { it.id !in d.used() }
-            .sortedBy { it.name.lowercase() }
+    // ---- dialogs -------------------------------------------------------------------------
+    private fun showDlg(b: AlertDialog.Builder): AlertDialog {
+        val dialog = b.create()
+        dialogRef = dialog
+        dialog.window?.setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY)
+        dialog.show()
+        return dialog
+    }
 
-        if (available.isEmpty()) return
+    private fun dlgBuilder() = AlertDialog.Builder(ContextThemeWrapper(this, android.R.style.Theme_DeviceDefault_Dialog_Alert))
 
+    private fun kindTitle(k: Slot) = when (k) {
+        Slot.ALLY_BAN -> "Ally ban"
+        Slot.ENEMY_BAN -> "Enemy ban"
+        Slot.ALLY_PICK -> "Ally pick"
+        Slot.ENEMY_PICK -> "Enemy pick"
+    }
+
+    private fun openSlotMenu(kind: Slot, i: Int) {
+        val name = d.at(kind, i)?.let { ds.heroes[it]?.name ?: it } ?: return
+        showDlg(
+            dlgBuilder().setTitle("${kindTitle(kind)}: $name")
+                .setItems(arrayOf("Change hero", "Remove hero")) { _, which ->
+                    if (which == 0) openPicker(kind, i) else { d.set(kind, i, null); refresh() }
+                }
+                .setNegativeButton("Cancel", null)
+        )
+    }
+
+    /** Searchable hero picker with lane filter. Edits exactly the tapped slot. */
+    private fun openPicker(kind: Slot, index: Int) {
+        val available = ds.heroes.values.filter { it.id !in d.used() }.sortedBy { it.name.lowercase() }
+        if (available.isEmpty()) { toast("No heroes left"); return }
+
+        var roleFilter: String? = null
         val wrap = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(dp(10), dp(2), dp(10), 0)
         }
-
         val search = EditText(this).apply {
             hint = "Search hero name..."
             setSingleLine(true)
-            textSize = 13f
+            textSize = 14f
             setTextColor(white)
             setHintTextColor(muted)
-            background = box(Color.parseColor("#C90D1711"), neonDim, 5f)
+            background = box(Color.parseColor("#C90D1711"), neonDim, 8f)
             setPadding(dp(10), 0, dp(10), 0)
         }
-        wrap.addView(search, LinearLayout.LayoutParams(-1, dp(38)))
+        wrap.addView(search, LinearLayout.LayoutParams(-1, dp(40)))
 
-        // Quick-pick shortcuts are available when filling an ally pick.
-        // They use the same supplied-data engine as the cards on the main overlay.
-        if (title == "Ally pick") {
-            val scored = Engine.picks(ds, d, SettingsManager.pick(this)).values.flatten()
-            val mainHero = scored.maxByOrNull { it.score }?.hero
-            val tierValue = mapOf("SS" to 6, "S" to 5, "A" to 4, "B" to 3, "C" to 2, "D" to 1)
-            val tournamentHero = ds.heroes.values
-                .filter { it.id !in d.used() && it.tournamentTier != null }
-                .maxWithOrNull(compareBy<Hero> { tierValue[it.tournamentTier] ?: 0 }
-                    .thenBy { scored.filter { s -> s.hero.id == it.id }.maxOfOrNull { s -> s.score } ?: 0.0 })
-
-            val quick = LinearLayout(this).apply {
-                orientation = LinearLayout.HORIZONTAL
-                setPadding(0, dp(2), 0, dp(2))
-            }
-
-            fun quickButton(text: String, hero: Hero?, accent: Int): TextView = TextView(this).apply {
-                this.text = if (hero == null) text else "$text\n${hero.name}"
-                mono(this, 7.5f, white)
+        // Quick picks for ally picks: use the same engine as the main cards.
+        if (kind == Slot.ALLY_PICK) {
+            val pm = Engine.picks(ds, d, SettingsManager.pick(this), 1)
+            val rank = pm.values.flatten().maxByOrNull { it.score }?.hero
+            val tour = tournamentPick(pm)
+            fun quick(title: String, hero: Hero?, accent: Int) = TextView(this).apply {
+                text = if (hero == null) title else "$title\n${hero.name}"
+                textSize = 10f
+                setTextColor(white)
                 gravity = Gravity.CENTER
-                setPadding(dp(4), dp(3), dp(4), dp(3))
-                background = box(Color.parseColor("#A6101812"), accent, 4f)
-                layoutParams = LinearLayout.LayoutParams(0, dp(48), 1f).apply {
-                    marginStart = dp(2)
-                    marginEnd = dp(2)
-                }
-                isEnabled = hero != null
+                background = box(Color.parseColor("#26" + String.format("%06X", accent and 0xFFFFFF)), accent, 9f)
+                layoutParams = weighted(44)
+                if (hero != null) setOnClickListener { d.set(kind, index, hero.id); refresh(); dialogRef?.dismiss() }
             }
-
-            quick.addView(quickButton("★ RANK PICK", mainHero, neon).apply {
-                setOnClickListener {
-                    mainHero?.let { d.add(target, it.id); refresh(); dialogRef?.dismiss() }
-                }
+            wrap.addView(hRow().apply {
+                setPadding(0, dp(4), 0, dp(2))
+                addView(quick("★ RANK PICK", rank, neon)); addView(quick("◎ TOURNAMENT", tour, amber))
             })
-            quick.addView(quickButton("◎ TOURNAMENT PICK", tournamentHero, amber).apply {
-                setOnClickListener {
-                    tournamentHero?.let { d.add(target, it.id); refresh(); dialogRef?.dismiss() }
-                }
-            })
-            wrap.addView(quick, LinearLayout.LayoutParams(-1, dp(48)))
         }
 
-        val count = label("${available.size} heroes available", 8f, muted).apply {
-            setPadding(dp(2), dp(5), dp(2), dp(3))
-        }
-        wrap.addView(count)
-
+        // Lane filter chips
+        val filterNames = listOf<String?>(null) + ROLES
+        val filterViews = ArrayList<TextView>()
+        val count = tv("", 10f, muted).apply { setPadding(dp(2), dp(4), dp(2), dp(3)) }
         val list = ListView(this).apply {
             dividerHeight = dp(1)
-            divider = box(Color.parseColor("#5527A84C"), Color.TRANSPARENT, 0f)
+            divider = box(Color.parseColor("#3327A84C"), Color.TRANSPARENT, 0f)
         }
-        wrap.addView(list, LinearLayout.LayoutParams(-1, dp(250)))
 
-        fun names(filter: String): List<Hero> {
-            val q = filter.trim().lowercase()
-            return if (q.isEmpty()) available
-            else available.filter {
-                it.name.lowercase().contains(q) || it.id.lowercase().contains(q)
+        fun visible(): List<Hero> {
+            val q = search.text.toString().trim().lowercase()
+            val rf = roleFilter
+            return available.filter { h ->
+                (rf == null || h.roles.contains(rf)) &&
+                    (q.isEmpty() || h.name.lowercase().contains(q) || h.id.lowercase().contains(q))
             }
         }
 
-        fun render(items: List<Hero>) {
+        fun render() {
+            val items = visible()
             count.text = if (items.isEmpty()) "No matching hero" else "${items.size} heroes"
-            list.adapter = object : ArrayAdapter<Hero>(
-                this, android.R.layout.simple_list_item_1, items
-            ) {
-                override fun getView(position: Int, convertView: View?, parent: android.view.ViewGroup): View {
+            list.adapter = object : ArrayAdapter<Hero>(this@OverlayService, android.R.layout.simple_list_item_1, items) {
+                override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
                     val v = super.getView(position, convertView, parent) as TextView
-                    v.text = getItem(position)?.name ?: ""
-                    v.textSize = 13f
+                    val h = getItem(position)
+                    val sb = SpannableStringBuilder(h?.name ?: "")
+                    sb.append("   ")
+                    val st = sb.length
+                    sb.append(h?.roles?.joinToString(" · ") { short(it) } ?: "")
+                    sb.setSpan(ForegroundColorSpan(muted), st, sb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    sb.setSpan(RelativeSizeSpan(0.75f), st, sb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    v.text = sb
+                    v.textSize = 14f
                     v.setTextColor(white)
                     v.setPadding(dp(10), 0, dp(10), 0)
                     v.setBackgroundColor(Color.TRANSPARENT)
-                    v.typeface = Typeface.create(Typeface.MONOSPACE, Typeface.NORMAL)
                     return v
                 }
             }
             list.setOnItemClickListener { _, _, position, _ ->
-                val chosen = items[position]
-                d.add(target, chosen.id)
+                d.set(kind, index, items[position].id)
                 refresh()
                 dialogRef?.dismiss()
             }
         }
 
+        fun styleFilters() {
+            filterViews.forEachIndexed { i, v ->
+                val on = filterNames[i] == roleFilter
+                val accent = filterNames[i]?.let { laneColor[it] } ?: neon
+                v.setTextColor(if (on) Color.BLACK else accent)
+                v.background = box(if (on) accent else Color.TRANSPARENT, accent, 8f)
+            }
+        }
+
+        wrap.addView(hRow().apply {
+            setPadding(0, dp(4), 0, dp(2))
+            filterNames.forEachIndexed { i, r ->
+                val t = tv(if (r == null) "ALL" else short(r), 10f, neon, true).apply {
+                    gravity = Gravity.CENTER
+                    layoutParams = weighted(28, 1)
+                    setOnClickListener { roleFilter = r; styleFilters(); render() }
+                }
+                filterViews += t
+                addView(t)
+            }
+        })
+        wrap.addView(count)
+        wrap.addView(list, LinearLayout.LayoutParams(-1, dp(250)))
+
         search.addTextChangedListener(object : android.text.TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                render(names(s?.toString().orEmpty()))
-            }
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) { render() }
             override fun afterTextChanged(s: android.text.Editable?) = Unit
         })
 
-        val dialog = AlertDialog.Builder(
-            ContextThemeWrapper(this, android.R.style.Theme_DeviceDefault_Dialog_Alert)
+        styleFilters()
+        render()
+        val dialog = showDlg(
+            dlgBuilder().setTitle(kindTitle(kind) + "  #${index + 1}").setView(wrap).setNegativeButton("Cancel", null)
         )
-            .setTitle(title)
-            .setView(wrap)
-            .setNegativeButton("Cancel", null)
-            .create()
-
-        dialogRef = dialog
-        render(available)
-        dialog.window?.setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY)
-        dialog.setOnShowListener {
-            search.requestFocus()
-            dialog.window?.setSoftInputMode(
-                android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE
-            )
-        }
-        dialog.show()
+        search.requestFocus()
+        dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
     }
-
-    private var dialogRef: AlertDialog? = null
 }
