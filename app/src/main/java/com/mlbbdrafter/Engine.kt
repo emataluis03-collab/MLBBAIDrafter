@@ -40,10 +40,39 @@ class Draft {
     }
 
     fun clear() { snapshot(); s = fresh() }
+
+    /** Saved so the draft survives the overlay being restarted by the system. */
+    fun toJson(): String {
+        val o = org.json.JSONObject()
+        Slot.values().forEach { k ->
+            val a = org.json.JSONArray()
+            s[k]!!.forEach { a.put(it ?: "") }
+            o.put(k.name, a)
+        }
+        return o.toString()
+    }
+
+    fun fromJson(text: String?, valid: (String) -> Boolean) {
+        if (text == null) return
+        try {
+            val o = org.json.JSONObject(text)
+            val n = fresh()
+            Slot.values().forEach { k ->
+                val a = o.optJSONArray(k.name) ?: return@forEach
+                for (i in 0 until minOf(5, a.length())) {
+                    val v = a.optString(i, "")
+                    if (v.isNotEmpty() && valid(v)) n[k]!![i] = v
+                }
+            }
+            s = n
+            history.clear()
+        } catch (_: Exception) { }
+    }
 }
 
 data class Scored(val hero: Hero, val score: Double, val incomplete: Boolean, val why: List<String>)
 data class Prob(val ally: Double, val notes: List<String>)
+data class Next(val hero: Hero, val score: Double, val level: String)
 
 object Engine {
     private fun avg(l: List<Double>): Double? = if (l.isEmpty()) null else l.average()
@@ -139,6 +168,42 @@ object Engine {
                     .thenByDescending { it.hero.metaScore ?: -999.0 }
                     .thenByDescending { it.hero.firstPickScore ?: -999.0 }
             ).take(n)
+        }
+    }
+
+    /**
+     * ENEMY NEXT PICK. Ranks heroes by priority using ONLY the supplied statistics (ban/pick/win rate,
+     * rank tier, tournament tier, meta, first-pick, and matchup data vs our picks when it exists).
+     * This is a priority score, NOT a probability: the dataset has no "after X the enemy picks Y" data.
+     */
+    fun enemyNext(ds: Dataset, d: Draft, n: Int = 5): List<Next> {
+        val tier = mapOf("SS" to 6.0, "S" to 5.0, "A" to 4.0, "B" to 3.0, "C" to 2.0, "D" to 1.0)
+        val used = d.used().toSet()
+        var c = ds.heroes.values.filter { it.id !in used }
+        // Once the enemy has picks, prefer heroes that fill a lane they still need.
+        val enemyLanes = assignLanes(d.enemyPicks, ds).values.toSet()
+        val open = ROLES.filter { it !in enemyLanes }
+        if (d.enemyPicks.isNotEmpty() && open.isNotEmpty()) {
+            val fit = c.filter { h -> h.roles.any { it in open } }
+            if (fit.isNotEmpty()) c = fit
+        }
+        val ally = d.allyPicks
+        val raw = c.map { h ->
+            mapOf<String, Double?>(
+                "banRate" to (h.rankBanRate ?: h.banRate),
+                "pickRate" to (h.rankPickRate ?: h.pickRate),
+                "winRate" to (h.rankWinRate ?: h.winRate),
+                "rankTier" to h.rankTier?.let { tier[it] },
+                "tourTier" to h.tournamentTier?.let { tier[it] },
+                "meta" to h.metaScore,
+                "firstPick" to h.firstPickScore,
+                "vsAlly" to avg(ally.mapNotNull { ds.mu(h.id, it) })
+            )
+        }
+        val w = mapOf("banRate" to 25.0, "pickRate" to 20.0, "winRate" to 15.0, "rankTier" to 15.0,
+            "tourTier" to 15.0, "meta" to 5.0, "firstPick" to 5.0, "vsAlly" to 15.0)
+        return combine(c, raw, w).take(n).mapIndexed { i, s ->
+            Next(s.hero, s.score, if (i < 3) "HIGH" else if (i < 5) "MEDIUM" else "LOW")
         }
     }
 

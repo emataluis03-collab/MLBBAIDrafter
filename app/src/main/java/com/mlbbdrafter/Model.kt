@@ -115,11 +115,24 @@ object DataImporter {
 
 object Store {
     private fun f(c: Context) = File(c.filesDir, "dataset.json")
-    fun raw(c: Context): String =
-        if (f(c).exists()) f(c).readText() else c.assets.open("sample_dataset.json").bufferedReader().readText()
+    private fun p(c: Context) = c.getSharedPreferences("dataset", Context.MODE_PRIVATE)
+
+    /** True only when the user imported a dataset on purpose. A dataset.json with no such mark is stale and ignored. */
+    fun isImported(c: Context): Boolean = f(c).exists() && p(c).getBoolean("imported", false)
+    fun source(c: Context): String = if (isImported(c)) "IMPORTED" else "BUNDLED"
+
+    fun raw(c: Context): String {
+        if (isImported(c)) return f(c).readText()
+        if (f(c).exists()) f(c).delete()   // stale leftover from an older version
+        return c.assets.open("sample_dataset.json").bufferedReader().readText()
+    }
     fun load(c: Context): Dataset = DataImporter.parse(raw(c))
-    fun save(c: Context, text: String) { DataImporter.parse(text); f(c).writeText(text) }
-    fun reset(c: Context) { f(c).delete() }
+    fun save(c: Context, text: String) {
+        DataImporter.parse(text)
+        f(c).writeText(text)
+        p(c).edit().putBoolean("imported", true).apply()
+    }
+    fun reset(c: Context) { f(c).delete(); p(c).edit().putBoolean("imported", false).apply() }
 }
 
 object SettingsManager {
