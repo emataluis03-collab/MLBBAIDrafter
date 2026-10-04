@@ -30,6 +30,7 @@ import java.io.File
  * broadcasts the result to our own overlay. It never injects taps, picks, bans or any input into MLBB.
  */
 class CaptureService : Service() {
+    private val AUTODETECT_V2 = "READ_ONLY_CAPTURE_ACTIVE"
     companion object {
         const val EXTRA_RESULT_CODE = "result_code"
         const val EXTRA_RESULT_DATA = "result_data"
