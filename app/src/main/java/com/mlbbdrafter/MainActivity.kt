@@ -1,49 +1,16 @@
 package com.mlbbdrafter
 
 import android.content.Intent
-import android.media.projection.MediaProjectionManager
-import android.graphics.Color
-import android.graphics.Typeface
-import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
-import android.view.Gravity
 import android.widget.*
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 
 class MainActivity : ComponentActivity() {
     private lateinit var info: TextView
-    private lateinit var detInfo: TextView
     private val fields = linkedMapOf<String, EditText>()
-
-    private val neon = Color.parseColor("#4DFF88")
-    private val red = Color.parseColor("#FF5A6E")
-    private val amber = Color.parseColor("#FFC857")
-    private val bg = Color.parseColor("#0A0F14")
-    private val cardBg = Color.parseColor("#131B22")
-    private val white = Color.parseColor("#EAF4EE")
-    private val muted = Color.parseColor("#7E9488")
-
-    // Screen capture consent. READ-ONLY: it only lets us look at the screen, never control the game.
-    private val captureLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        val data = result.data
-        if (result.resultCode == RESULT_OK && data != null) {
-            if (!Settings.canDrawOverlays(this)) {
-                toast("Grant Display over other apps first")
-                return@registerForActivityResult
-            }
-            startForegroundService(Intent(this, OverlayService::class.java))
-            startForegroundService(Intent(this, CaptureService::class.java).apply {
-                putExtra(CaptureService.EXTRA_RESULT_CODE, result.resultCode)
-                putExtra(CaptureService.EXTRA_RESULT_DATA, data)
-            })
-            toast("Auto detection started (read-only)")
-        } else {
-            toast("Screen capture permission was cancelled")
-        }
-    }
 
     private val importer = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         uri ?: return@registerForActivityResult
@@ -59,132 +26,43 @@ class MainActivity : ComponentActivity() {
         toast("Exported")
     }
 
-    private fun dp(v: Int) = (v * resources.displayMetrics.density).toInt()
     private fun toast(s: String) = Toast.makeText(this, s, Toast.LENGTH_LONG).show()
-    private fun rounded(fill: Int, stroke: Int, r: Int = 14) = GradientDrawable().apply {
-        setColor(fill); setStroke(dp(1), stroke); cornerRadius = dp(r).toFloat()
-    }
-    private fun tint(c: Int) = Color.parseColor("#33" + String.format("%06X", c and 0xFFFFFF))
-
-    private fun b(t: String, accent: Int = neon, f: () -> Unit) = Button(this).apply {
-        text = t
-        isAllCaps = false
-        setTextColor(accent)
-        textSize = 14f
-        typeface = Typeface.create("sans-serif-medium", Typeface.BOLD)
-        background = rounded(tint(accent), accent, 12)
-        layoutParams = LinearLayout.LayoutParams(-1, dp(48)).apply { bottomMargin = dp(8) }
-        setOnClickListener { f() }
-    }
-
-    private fun card(title: String, build: LinearLayout.() -> Unit) = LinearLayout(this).apply {
-        orientation = LinearLayout.VERTICAL
-        setPadding(dp(14), dp(12), dp(14), dp(10))
-        background = rounded(cardBg, Color.parseColor("#33FFFFFF"), 16)
-        layoutParams = LinearLayout.LayoutParams(-1, -2).apply { bottomMargin = dp(12) }
-        addView(TextView(this@MainActivity).apply {
-            text = title; textSize = 12f; setTextColor(neon); letterSpacing = 0.1f
-            typeface = Typeface.create("sans-serif-medium", Typeface.BOLD)
-            setPadding(0, 0, 0, dp(8))
-        })
-        build()
-    }
+    private fun b(t: String, f: () -> Unit) = Button(this).apply { text = t; setOnClickListener { f() } }
 
     override fun onCreate(s: Bundle?) {
         super.onCreate(s)
-        val col = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(dp(16), dp(36), dp(16), dp(24)) }
-
-        col.addView(TextView(this).apply {
-            text = "MLBB AI Lineup Drafter"; textSize = 24f; setTextColor(white)
-            typeface = Typeface.create("sans-serif-medium", Typeface.BOLD)
+        val col = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(32, 48, 32, 32) }
+        col.addView(TextView(this).apply { text = "MLBB AI Lineup Drafter"; textSize = 22f })
+        col.addView(b("1. Grant 'Display over other apps'") {
+            startActivity(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName")))
         })
-        col.addView(TextView(this).apply {
-            text = "Draft overlay with lane-by-lane hero suggestions"; textSize = 13f; setTextColor(muted)
-            setPadding(0, dp(2), 0, dp(14))
+        col.addView(b("2. Import dataset (JSON)") { importer.launch(arrayOf("*/*")) })
+        col.addView(b("Export dataset") { exporter.launch("mlbb_dataset.json") })
+        col.addView(b("Reset to SAMPLE data") { Store.reset(this); status() })
+        col.addView(b("3. Start overlay") {
+            if (Settings.canDrawOverlays(this)) startService(Intent(this, OverlayService::class.java)) else toast("Grant overlay permission first")
         })
-
-        col.addView(card("SETUP") {
-            addView(b("1. Grant 'Display over other apps'") {
-                startActivity(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName")))
-            })
-            addView(b("2. Import dataset (JSON)", amber) { importer.launch(arrayOf("*/*")) })
-            addView(b("3. Start overlay") {
-                if (Settings.canDrawOverlays(this@MainActivity)) startForegroundService(Intent(this@MainActivity, OverlayService::class.java))
-                else toast("Grant overlay permission first")
-            })
-            addView(b("Stop overlay", red) { stopService(Intent(this@MainActivity, OverlayService::class.java)) })
+        col.addView(b("Stop overlay") { stopService(Intent(this, OverlayService::class.java)) })
+        col.addView(TextView(this).apply { text = "\nScore weights (any scale; normalised automatically)"; textSize = 16f })
+        fun wRow(prefix: String, m: Map<String, Double>) = m.forEach { (k, v) ->
+            val e = EditText(this).apply { setText(v.toString()); inputType = 8194; hint = "$prefix $k" }
+            fields["${prefix}_$k"] = e
+            col.addView(TextView(this).apply { text = "$prefix: $k" }); col.addView(e)
+        }
+        wRow("pick", SettingsManager.pick(this)); wRow("ban", SettingsManager.ban(this))
+        col.addView(b("Save weights") {
+            fields.forEach { (k, e) -> SettingsManager.set(this, k, e.text.toString().toFloatOrNull() ?: 0f) }
+            toast("Saved. Press ANALYZE in overlay.")
         })
-
-        col.addView(card("AUTO DETECTION  (READ-ONLY)") {
-            detInfo = TextView(this@MainActivity).apply { setTextColor(white); textSize = 12f }
-            addView(detInfo)
-            addView(TextView(this@MainActivity).apply { setPadding(0, 0, 0, dp(6)) })
-            addView(b("4. Download hero templates", amber) {
-                toast("Downloading hero templates... keep the app open")
-                TemplatePackInstaller.downloadAsync(this@MainActivity,
-                    { done, total -> runOnUiThread { detInfo.text = "Downloading templates: $done / $total" } },
-                    { _, msg -> runOnUiThread { toast(msg); detStatus() } })
-            })
-            addView(b("5. Start auto detection") {
-                if (!Settings.canDrawOverlays(this@MainActivity)) {
-                    toast("Grant Display over other apps first")
-                } else if (TemplatePackInstaller.count(this@MainActivity) == 0) {
-                    toast("Download hero templates first")
-                } else {
-                    val pm = getSystemService(MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
-                    captureLauncher.launch(pm.createScreenCaptureIntent())
-                }
-            })
-            addView(b("Stop detection", red) { stopService(Intent(this@MainActivity, CaptureService::class.java)) })
-        })
-
-        col.addView(card("DATASET") {
-            info = TextView(this@MainActivity).apply { setTextColor(white); textSize = 12f }
-            addView(info)
-            addView(TextView(this@MainActivity).apply { setPadding(0, 0, 0, dp(6)) })
-            addView(b("Export dataset", amber) { exporter.launch("mlbb_dataset.json") })
-            addView(b("Reset to SAMPLE data", red) { Store.reset(this@MainActivity); status() })
-        })
-
-        col.addView(card("SCORE WEIGHTS  (any scale, auto-normalised)") {
-            fun wRow(prefix: String, m: Map<String, Double>) = m.forEach { (k, v) ->
-                val e = EditText(this@MainActivity).apply {
-                    setText(v.toString()); inputType = 8194; hint = "$prefix $k"
-                    setTextColor(white); setHintTextColor(muted)
-                    background = rounded(Color.parseColor("#80182028"), Color.parseColor("#33FFFFFF"), 10)
-                    setPadding(dp(10), dp(6), dp(10), dp(6))
-                }
-                fields["${prefix}_$k"] = e
-                addView(TextView(this@MainActivity).apply {
-                    text = "${prefix.uppercase()}  •  $k"; setTextColor(muted); textSize = 11f; setPadding(0, dp(6), 0, dp(2))
-                })
-                addView(e)
-            }
-            wRow("pick", SettingsManager.pick(this@MainActivity)); wRow("ban", SettingsManager.ban(this@MainActivity))
-            addView(TextView(this@MainActivity).apply { setPadding(0, 0, 0, dp(8)) })
-            addView(b("Save weights") {
-                fields.forEach { (k, e) -> SettingsManager.set(this@MainActivity, k, e.text.toString().toFloatOrNull() ?: 0f) }
-                toast("Saved. Reopen the overlay to apply.")
-            })
-        })
-
-        setContentView(ScrollView(this).apply { setBackgroundColor(bg); addView(col) })
+        info = TextView(this); col.addView(info)
+        setContentView(ScrollView(this).apply { addView(col) })
         status()
-        detStatus()
-        if (android.os.Build.VERSION.SDK_INT >= 33 &&
-            checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED
-        ) requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 1)
-    }
-
-    private fun detStatus() {
-        detInfo.text = "Templates ready: ${TemplatePackInstaller.count(this)} / 133\nOn the capture prompt choose: Entire screen"
     }
 
     private fun status() {
         try {
             val ds = Store.load(this)
-            info.text = "${ds.label}\n${ds.heroes.size} heroes  •  source: ${Store.source(this)}" +
-                if (ds.warnings.isEmpty()) "" else "\n\nWarnings (${ds.warnings.size}):\n" + ds.warnings.take(8).joinToString("\n") { "• $it" }
-        } catch (e: Exception) { info.text = "Dataset error: ${e.message}" }
+            info.text = "\nDataset: ${ds.label}\nHeroes: ${ds.heroes.size}\nWarnings (${ds.warnings.size}):\n" + ds.warnings.joinToString("\n") { "• $it" }
+        } catch (e: Exception) { info.text = "\nDataset error: ${e.message}" }
     }
 }
