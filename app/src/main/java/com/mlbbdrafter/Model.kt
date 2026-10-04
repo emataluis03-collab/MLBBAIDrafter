@@ -123,7 +123,7 @@ object Store {
 }
 
 object SettingsManager {
-    val PICK = linkedMapOf("synergy" to 25.0, "counter" to 25.0, "winRate" to 20.0, "laneRank" to 15.0, "roleWinRate" to 5.0, "pickRate" to 5.0, "personal" to 5.0)
+    val PICK = linkedMapOf("synergy" to 30.0, "counter" to 30.0, "winRate" to 20.0, "pickRate" to 10.0, "personal" to 10.0)
     val BAN = linkedMapOf("threat" to 30.0, "counter" to 25.0, "enemySynergy" to 20.0, "winRate" to 15.0, "banRate" to 10.0)
     private fun p(c: Context) = c.getSharedPreferences("weights", 0)
     fun pick(c: Context): Map<String, Double> = PICK.mapValues { p(c).getFloat("pick_${it.key}", it.value.toFloat()).toDouble() }
