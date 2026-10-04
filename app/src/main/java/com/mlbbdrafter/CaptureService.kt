@@ -5,6 +5,8 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
+import android.content.pm.ServiceInfo
+import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.PixelFormat
 import android.graphics.Rect
@@ -15,12 +17,18 @@ import android.media.projection.MediaProjection
 import android.media.projection.MediaProjectionManager
 import android.os.Build
 import android.os.Handler
+import android.os.HandlerThread
 import android.os.IBinder
-import android.os.Looper
-import androidx.core.app.NotificationCompat
-import java.util.concurrent.atomic.AtomicBoolean
+import android.os.SystemClock
+import android.util.DisplayMetrics
+import android.util.Log
+import android.view.WindowManager
+import java.io.File
 
-/** Screen capture is read-only. It never injects taps or touches into MLBB. */
+/**
+ * READ-ONLY screen observer. It captures frames, compares draft-slot crops with hero templates and
+ * broadcasts the result to our own overlay. It never injects taps, picks, bans or any input into MLBB.
+ */
 class CaptureService : Service() {
     companion object {
         const val EXTRA_RESULT_CODE = "result_code"
@@ -31,127 +39,222 @@ class CaptureService : Service() {
         const val EXTRA_INDEX = "index"
         const val EXTRA_HERO_ID = "hero_id"
         const val EXTRA_CONF = "confidence"
-        const val EXTRA_TEMPLATE_COUNT = "template_count"
         private const val CHANNEL = "draft_detection"
         private const val NOTIFICATION_ID = 4401
+        private const val MIN_SCORE = 0.80      // correlation needed to count a frame
+        private const val MIN_MARGIN = 0.04     // best must beat the 2nd best hero by this much
+        private const val STABLE_FRAMES = 3     // consecutive agreeing frames before the draft changes
+        private const val FRAME_GAP_MS = 400L   // at most ~2.5 analysed frames per second
+        private const val MAX_SIDE = 1280       // capture is downscaled: no need for full resolution
     }
 
     private var projection: MediaProjection? = null
     private var display: VirtualDisplay? = null
     private var reader: ImageReader? = null
-    private val handler = Handler(Looper.getMainLooper())
-    private val running = AtomicBoolean(false)
+    private var thread: HandlerThread? = null
+    private var handler: Handler? = null
+    private var matcher: HeroTemplateMatcher? = null
     private var lastRun = 0L
-    private lateinit var matcher: HeroTemplateMatcher
+    private var capW = 0
+    private var capH = 0
+    private var started = false
+    private val streak = HashMap<String, Pair<String, Int>>()
+    private val confirmed = HashMap<String, String>()
 
     override fun onBind(intent: Intent?): IBinder? = null
 
+    @Suppress("DEPRECATION")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val code = intent?.getIntExtra(EXTRA_RESULT_CODE, -1) ?: -1
-        val data = if (Build.VERSION.SDK_INT >= 33) intent?.getParcelableExtra(EXTRA_RESULT_DATA, android.content.Intent::class.java)
-                   else @Suppress("DEPRECATION") intent?.getParcelableExtra(EXTRA_RESULT_DATA)
-        if (code <= 0 || data == null) {
+        val data: Intent? = if (Build.VERSION.SDK_INT >= 33) {
+            intent?.getParcelableExtra(EXTRA_RESULT_DATA, Intent::class.java)
+        } else {
+            intent?.getParcelableExtra(EXTRA_RESULT_DATA)
+        }
+        // startForegroundService() requires startForeground() quickly, even if we then give up.
+        runCatching { startForegroundCompat() }.onFailure { Log.e("Drafter", "foreground failed", it) }
+        if (started) return START_NOT_STICKY
+        if (code == -1 || data == null) {
+            // Only a result from the system consent screen is valid. Do nothing else.
             stopSelf()
             return START_NOT_STICKY
         }
-        startForegroundCompat()
-        startCapture(code, data)
+        try {
+            startCapture(code, data)
+            started = true
+        } catch (e: Exception) {
+            Log.e("Drafter", "capture start failed", e)
+            stopSelf()
+        }
         return START_NOT_STICKY
     }
 
     private fun startForegroundCompat() {
-        val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-        if (Build.VERSION.SDK_INT >= 26) nm.createNotificationChannel(NotificationChannel(CHANNEL, "MLBB Draft Detection", NotificationManager.IMPORTANCE_LOW))
-        val n: Notification = NotificationCompat.Builder(this, CHANNEL)
+        val nm = getSystemService(NotificationManager::class.java)
+        nm.createNotificationChannel(NotificationChannel(CHANNEL, "MLBB Draft Detection", NotificationManager.IMPORTANCE_LOW))
+        val n: Notification = Notification.Builder(this, CHANNEL)
             .setSmallIcon(android.R.drawable.ic_menu_view)
             .setContentTitle("MLBB Draft Assistant")
-            .setContentText("Screen detection is active — read-only")
+            .setContentText("Screen detection is active (read-only)")
             .setOngoing(true)
             .build()
         if (Build.VERSION.SDK_INT >= 29) {
-            startForeground(NOTIFICATION_ID, n, android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION)
-        } else startForeground(NOTIFICATION_ID, n)
+            startForeground(NOTIFICATION_ID, n, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION)
+        } else {
+            startForeground(NOTIFICATION_ID, n)
+        }
+    }
+
+    private fun realSize(): Pair<Int, Int> {
+        val wm = getSystemService(WINDOW_SERVICE) as WindowManager
+        val m = DisplayMetrics()
+        @Suppress("DEPRECATION") wm.defaultDisplay.getRealMetrics(m)
+        return m.widthPixels to m.heightPixels
+    }
+
+    /** Capture size: real screen, scaled so the long side is at most MAX_SIDE. */
+    private fun captureSize(): Pair<Int, Int> {
+        val (w, h) = realSize()
+        val longSide = maxOf(w, h)
+        val f = if (longSide > MAX_SIDE) MAX_SIDE.toFloat() / longSide else 1f
+        return maxOf(2, (w * f).toInt()) to maxOf(2, (h * f).toInt())
+    }
+
+    private fun newReader(w: Int, h: Int): ImageReader {
+        val r = ImageReader.newInstance(w, h, PixelFormat.RGBA_8888, 2)
+        r.setOnImageAvailableListener({ ir -> onFrame(ir, w, h) }, handler)
+        return r
     }
 
     private fun startCapture(code: Int, data: Intent) {
-        if (running.getAndSet(true)) return
-        val dm = resources.displayMetrics
-        val w = dm.widthPixels
-        val h = dm.heightPixels
-        val density = dm.densityDpi
         val mgr = getSystemService(MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
-        projection = mgr.getMediaProjection(code, data)
-        reader = ImageReader.newInstance(w, h, PixelFormat.RGBA_8888, 2)
-        reader!!.setOnImageAvailableListener({ ir ->
-            val now = System.currentTimeMillis()
-            if (now - lastRun < 350L) {
-                ir.acquireLatestImage()?.close()
-                return@setOnImageAvailableListener
-            }
-            lastRun = now
-            val image = ir.acquireLatestImage() ?: return@setOnImageAvailableListener
-            try {
-                val plane = image.planes[0]
-                val buffer = plane.buffer
-                val pixelStride = plane.pixelStride
-                val rowStride = plane.rowStride
-                val rowPadding = rowStride - pixelStride * w
-                val bmp = Bitmap.createBitmap(w + rowPadding / pixelStride, h, Bitmap.Config.ARGB_8888)
-                bmp.copyPixelsFromBuffer(buffer)
-                detect(bmp, w, h)
-                bmp.recycle()
-            } finally { image.close() }
-        }, handler)
-        display = projection!!.createVirtualDisplay(
-            "MLBB-Draft-ReadOnly", w, h, density,
-            DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
-            reader!!.surface, null, handler
+        val proj = mgr.getMediaProjection(code, data)
+        if (proj == null) {
+            stopSelf()
+            return
+        }
+        projection = proj
+
+        val t = HandlerThread("draft-capture")
+        t.start()
+        thread = t
+        val h = Handler(t.looper)
+        handler = h
+
+        // Android 14+ requires a callback to be registered BEFORE creating the virtual display.
+        proj.registerCallback(object : MediaProjection.Callback() {
+            override fun onStop() { stopSelf() }
+        }, h)
+
+        // Templates are loaded ONCE here, not on every frame.
+        val ds = Store.load(this)
+        val m = HeroTemplateMatcher(File(filesDir, "hero_templates"), ds.heroes)
+        m.reload()
+        matcher = m
+
+        val (cw, ch) = captureSize()
+        capW = cw
+        capH = ch
+        val r = newReader(cw, ch)
+        reader = r
+        display = proj.createVirtualDisplay(
+            "MLBB-Draft-ReadOnly", cw, ch, resources.displayMetrics.densityDpi,
+            DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR, r.surface, null, h
         )
+        val n = m.size()
+        h.postDelayed({
+            sendStatus(if (n == 0) "NO TEMPLATES - DOWNLOAD THEM FIRST" else "DETECTOR ACTIVE - $n TEMPLATES")
+        }, 800)
     }
 
-    private fun detect(frame: Bitmap, w: Int, h: Int) {
-        val ds = Store.load(this)
-        matcher = HeroTemplateMatcher(java.io.File(filesDir, "hero_templates"), ds.heroes)
-        matcher.reload()
-        sendStatus("DETECTOR ACTIVE • ${matcher.size()} TEMPLATES")
-        if (matcher.size() == 0) return
-        for (slot in DraftSlotLayout.slots(w, h)) {
-            val r = Rect(
-                (slot.rect.left * w).toInt(), (slot.rect.top * h).toInt(),
-                (slot.rect.right * w).toInt(), (slot.rect.bottom * h).toInt()
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        val disp = display ?: return
+        val (cw, ch) = captureSize()
+        if (cw == capW && ch == capH) return
+        try {
+            capW = cw
+            capH = ch
+            val old = reader
+            val r = newReader(cw, ch)
+            reader = r
+            disp.resize(cw, ch, resources.displayMetrics.densityDpi)
+            disp.surface = r.surface
+            old?.close()
+        } catch (e: Exception) {
+            Log.e("Drafter", "resize failed", e)
+        }
+    }
+
+    private fun onFrame(ir: ImageReader, w: Int, h: Int) {
+        val image = runCatching { ir.acquireLatestImage() }.getOrNull() ?: return
+        try {
+            val now = SystemClock.elapsedRealtime()
+            if (now - lastRun < FRAME_GAP_MS) return
+            lastRun = now
+            val plane = image.planes[0]
+            val padded = plane.rowStride / plane.pixelStride
+            val full = Bitmap.createBitmap(padded, h, Bitmap.Config.ARGB_8888)
+            full.copyPixelsFromBuffer(plane.buffer)
+            analyse(full, w, h)
+            full.recycle()
+        } catch (e: Exception) {
+            Log.e("Drafter", "frame failed", e)
+        } finally {
+            image.close()
+        }
+    }
+
+    /** Looks only at the 20 draft-slot crops, never the whole frame. */
+    private fun analyse(frame: Bitmap, w: Int, h: Int) {
+        val m = matcher ?: return
+        if (m.size() == 0) return
+        for (s in DraftSlotLayout.slots()) {
+            val key = s.kind.name + ":" + s.index
+            val rect = Rect(
+                (s.rect.left * w).toInt(), (s.rect.top * h).toInt(),
+                (s.rect.right * w).toInt(), (s.rect.bottom * h).toInt()
             )
-            val crop = frame.cropSafe(r) ?: continue
-            val result = matcher.match(crop)
+            val crop = frame.cropSafe(rect) ?: continue
+            val res = m.match(crop)
             crop.recycle()
-            if (result != null && result.second >= 0.84) {
-                val heroId = result.first
-                val hero = ds.heroes[heroId]
-                val text = "✓ DETECTED: ${hero?.name ?: heroId}  ${"%.0f".format(result.second * 100)}%"
-                sendResult(slot, heroId, result.second, text)
+            if (res == null || res.score < MIN_SCORE || res.margin < MIN_MARGIN) {
+                streak.remove(key)           // uncertain frame: never changes the draft
+                continue
+            }
+            val prev = streak[key]
+            val count = if (prev != null && prev.first == res.id) prev.second + 1 else 1
+            streak[key] = Pair(res.id, count)
+            if (count >= STABLE_FRAMES && confirmed[key] != res.id) {
+                confirmed[key] = res.id
+                sendResult(s, res.id, res.score)
             }
         }
     }
 
     private fun sendStatus(text: String) {
-        sendBroadcast(Intent(ACTION_RESULT).apply { putExtra(EXTRA_TEXT, text) })
+        sendBroadcast(Intent(ACTION_RESULT).setPackage(packageName).putExtra(EXTRA_TEXT, text))
     }
 
-    private fun sendResult(slot: DraftSlotLayout.Slot, id: String, confidence: Double, text: String) {
-        sendBroadcast(Intent(ACTION_RESULT).apply {
-            putExtra(EXTRA_TEXT, text)
-            putExtra(EXTRA_KIND, slot.kind.name)
-            putExtra(EXTRA_INDEX, slot.index)
-            putExtra(EXTRA_HERO_ID, id)
-            putExtra(EXTRA_CONF, confidence)
-            putExtra(EXTRA_TEMPLATE_COUNT, matcher.size())
-        })
+    private fun sendResult(slot: DraftSlotLayout.SlotRect, id: String, confidence: Double) {
+        sendBroadcast(
+            Intent(ACTION_RESULT).setPackage(packageName)
+                .putExtra(EXTRA_KIND, slot.kind.name)
+                .putExtra(EXTRA_INDEX, slot.index)
+                .putExtra(EXTRA_HERO_ID, id)
+                .putExtra(EXTRA_CONF, confidence)
+        )
     }
 
     override fun onDestroy() {
-        running.set(false)
-        display?.release(); display = null
-        reader?.close(); reader = null
-        projection?.stop(); projection = null
+        runCatching { display?.release() }
+        display = null
+        runCatching { reader?.close() }
+        reader = null
+        runCatching { projection?.stop() }
+        projection = null
+        runCatching { thread?.quitSafely() }
+        thread = null
         super.onDestroy()
     }
 }

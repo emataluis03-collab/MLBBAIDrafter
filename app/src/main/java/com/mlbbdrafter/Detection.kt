@@ -1,121 +1,127 @@
 package com.mlbbdrafter
 
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Rect
 import android.graphics.RectF
-import android.util.Log
 import java.io.File
 import java.util.Locale
-import kotlin.math.abs
 import kotlin.math.sqrt
 
-/** Read-only draft-slot geometry based on the supplied 1536x1067 MLBB draft screenshot. */
+/**
+ * READ-ONLY geometry of the 20 draft slots, as fractions (0..1) of the screen.
+ * These numbers are approximate (taken from a 1536x1067 reference screenshot). If detection looks at the
+ * wrong place on your phone, this is the ONLY place to calibrate.
+ */
 object DraftSlotLayout {
-    data class Slot(val kind: Kind, val index: Int, val rect: RectF)
-    enum class Kind { ALLY_BAN, ENEMY_BAN, ALLY_PICK, ENEMY_PICK }
+    data class SlotRect(val kind: Slot, val index: Int, val rect: RectF)
 
-    // Normalized coordinates (0..1). These are intentionally approximate and can be
-    // calibrated later for another aspect ratio/device layout.
-    private val refs = listOf(
-        Kind.ALLY_BAN to listOf(0.035f, 0.085f, 0.205f, 0.145f),
-        Kind.ENEMY_BAN to listOf(0.705f, 0.085f, 0.965f, 0.145f),
-        Kind.ALLY_PICK to listOf(0.035f, 0.17f, 0.19f, 0.88f),
-        Kind.ENEMY_PICK to listOf(0.81f, 0.17f, 0.965f, 0.88f)
+    // left, top, right, bottom
+    private val bounds = listOf(
+        Slot.ALLY_BAN to floatArrayOf(0.035f, 0.085f, 0.205f, 0.145f),
+        Slot.ENEMY_BAN to floatArrayOf(0.705f, 0.085f, 0.965f, 0.145f),
+        Slot.ALLY_PICK to floatArrayOf(0.035f, 0.17f, 0.19f, 0.88f),
+        Slot.ENEMY_PICK to floatArrayOf(0.81f, 0.17f, 0.965f, 0.88f)
     )
 
-    fun slots(width: Int, height: Int): List<Slot> {
-        val out = mutableListOf<Slot>()
-        for ((kind, bounds) in refs) {
-            val left = bounds[0] * width
-            val top = bounds[1] * height
-            val right = bounds[2] * width
-            val bottom = bounds[3] * height
-            if (kind == Kind.ALLY_BAN || kind == Kind.ENEMY_BAN) {
-                for (i in 0 until 5) {
-                    val step = (right - left) / 5f
-                    out += Slot(kind, i, RectF(left + i * step, top, left + (i + 1) * step, bottom))
+    /** Normalised (0..1) rectangles. Multiply by the frame / screen size to get pixels. */
+    fun slots(): List<SlotRect> {
+        val out = ArrayList<SlotRect>()
+        for ((kind, b) in bounds) {
+            val horizontal = kind == Slot.ALLY_BAN || kind == Slot.ENEMY_BAN
+            for (i in 0 until 5) {
+                val r = if (horizontal) {
+                    val step = (b[2] - b[0]) / 5f
+                    RectF(b[0] + i * step, b[1], b[0] + (i + 1) * step, b[3])
+                } else {
+                    val step = (b[3] - b[1]) / 5f
+                    RectF(b[0], b[1] + i * step, b[2], b[1] + (i + 1) * step)
                 }
-            } else {
-                for (i in 0 until 5) {
-                    val step = (bottom - top) / 5f
-                    out += Slot(kind, i, RectF(left, top + i * step, right, top + (i + 1) * step))
-                }
+                out.add(SlotRect(kind, i, r))
             }
         }
         return out
     }
 }
 
-data class DetectionResult(
-    val slot: DraftSlotLayout.Slot,
-    val heroId: String?,
-    val confidence: Double,
-    val state: String
-)
-
 /**
- * Lightweight local template matcher. It deliberately has no game-control code:
- * it only compares captured pixels against hero templates stored in filesDir/hero_templates.
+ * Lightweight local template matcher (zero-mean normalised correlation on a 16x16 grayscale centre crop).
+ * It only compares captured pixels with hero templates stored in filesDir/hero_templates.
+ * It contains no game-control code of any kind.
  */
 class HeroTemplateMatcher(private val templateDir: File, private val heroes: Map<String, Hero>) {
-    private data class Template(val id: String, val pixels: IntArray, val mean: Double)
-    private val templates = mutableListOf<Template>()
+    class Match(val id: String, val score: Double, val margin: Double)
+    private class Template(val id: String, val v: FloatArray)
 
-    fun reload() {
-        templates.clear()
-        if (!templateDir.exists()) return
-        templateDir.listFiles()?.filter { it.isFile && it.extension.lowercase(Locale.US) in setOf("png", "jpg", "jpeg") }
-            ?.forEach { file ->
-                val id = file.nameWithoutExtension
-                if (heroes.containsKey(id)) {
-                    android.graphics.BitmapFactory.decodeFile(file.absolutePath)?.let { bmp ->
-                        val small = Bitmap.createScaledBitmap(bmp, 16, 16, true)
-                        val arr = IntArray(16 * 16)
-                        small.getPixels(arr, 0, 16, 0, 0, 16, 16)
-                        val gray = arr.map { c ->
-                            0.299 * ((c shr 16) and 255) + 0.587 * ((c shr 8) and 255) + 0.114 * (c and 255)
-                        }.map { it / 255.0 }
-                        templates += Template(id, gray.map { (it * 255).toInt() }.toIntArray(), gray.average())
-                        small.recycle()
-                        bmp.recycle()
-                    }
-                }
-            }
-    }
+    private val templates = ArrayList<Template>()
+
+    companion object { private const val N = 16 }
 
     fun size(): Int = templates.size
 
-    fun match(crop: Bitmap): Pair<String, Double>? {
+    fun reload() {
+        templates.clear()
+        val files = templateDir.listFiles() ?: return
+        for (f in files) {
+            if (!f.isFile) continue
+            val ext = f.extension.lowercase(Locale.US)
+            if (ext != "png" && ext != "jpg" && ext != "jpeg") continue
+            val id = f.nameWithoutExtension
+            if (!heroes.containsKey(id)) continue
+            val bmp = BitmapFactory.decodeFile(f.absolutePath) ?: continue
+            templates.add(Template(id, vectorOf(bmp)))
+            bmp.recycle()
+        }
+    }
+
+    /** Centre square -> 16x16 grayscale -> zero mean, unit length. Does not recycle [src]. */
+    private fun vectorOf(src: Bitmap): FloatArray {
+        val side = minOf(src.width, src.height)
+        val sq = Bitmap.createBitmap(src, (src.width - side) / 2, (src.height - side) / 2, side, side)
+        val small = Bitmap.createScaledBitmap(sq, N, N, true)
+        val px = IntArray(N * N)
+        small.getPixels(px, 0, N, 0, 0, N, N)
+        if (small !== sq) small.recycle()
+        if (sq !== src) sq.recycle()
+
+        val g = FloatArray(N * N)
+        for (i in px.indices) {
+            val c = px[i]
+            g[i] = (0.299f * ((c shr 16) and 255) + 0.587f * ((c shr 8) and 255) + 0.114f * (c and 255)) / 255f
+        }
+        var mean = 0f
+        for (x in g) mean += x
+        mean /= g.size
+        var norm = 0f
+        for (i in g.indices) {
+            g[i] -= mean
+            norm += g[i] * g[i]
+        }
+        val len = sqrt(norm.toDouble()).toFloat()
+        if (len > 1e-6f) for (i in g.indices) g[i] /= len
+        return g
+    }
+
+    fun match(crop: Bitmap): Match? {
         if (templates.isEmpty()) return null
-        val small = Bitmap.createScaledBitmap(crop, 16, 16, true)
-        val arr = IntArray(256)
-        small.getPixels(arr, 0, 16, 0, 0, 16, 16)
-        val g = DoubleArray(256)
-        for (i in arr.indices) {
-            val c = arr[i]
-            g[i] = (0.299 * ((c shr 16) and 255) + 0.587 * ((c shr 8) and 255) + 0.114 * (c and 255)) / 255.0
-        }
-        val gm = g.average()
+        val v = vectorOf(crop)
+        var best = -2.0
+        var second = -2.0
         var bestId: String? = null
-        var best = Double.NEGATIVE_INFINITY
         for (t in templates) {
-            var mse = 0.0
-            var cov = 0.0
-            for (i in g.indices) {
-                val d = g[i] - t.pixels[i] / 255.0
-                mse += d * d
-                cov += (g[i] - gm) * (t.pixels[i] / 255.0 - t.mean)
-            }
-            mse /= g.size
-            val rmse = sqrt(mse)
-            val score = 1.0 - rmse
-            if (score > best) {
-                best = score
+            var dot = 0f
+            for (i in v.indices) dot += v[i] * t.v[i]
+            val s = dot.toDouble()
+            if (s > best) {
+                second = best
+                best = s
                 bestId = t.id
+            } else if (s > second) {
+                second = s
             }
         }
-        small.recycle()
-        return bestId?.let { it to best.coerceIn(0.0, 1.0) }
+        val id = bestId ?: return null
+        return Match(id, best.coerceIn(0.0, 1.0), (best - second).coerceAtLeast(0.0))
     }
 }
 

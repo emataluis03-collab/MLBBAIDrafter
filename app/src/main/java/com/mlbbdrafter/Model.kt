@@ -115,15 +115,28 @@ object DataImporter {
 
 object Store {
     private fun f(c: Context) = File(c.filesDir, "dataset.json")
-    fun raw(c: Context): String =
-        if (f(c).exists()) f(c).readText() else c.assets.open("sample_dataset.json").bufferedReader().readText()
+    private fun p(c: Context) = c.getSharedPreferences("dataset", Context.MODE_PRIVATE)
+
+    /** True only when the user imported a dataset on purpose. A dataset.json with no such mark is stale and ignored. */
+    fun isImported(c: Context): Boolean = f(c).exists() && p(c).getBoolean("imported", false)
+    fun source(c: Context): String = if (isImported(c)) "IMPORTED" else "BUNDLED"
+
+    fun raw(c: Context): String {
+        if (isImported(c)) return f(c).readText()
+        if (f(c).exists()) f(c).delete()   // stale leftover from an older version
+        return c.assets.open("sample_dataset.json").bufferedReader().readText()
+    }
     fun load(c: Context): Dataset = DataImporter.parse(raw(c))
-    fun save(c: Context, text: String) { DataImporter.parse(text); f(c).writeText(text) }
-    fun reset(c: Context) { f(c).delete() }
+    fun save(c: Context, text: String) {
+        DataImporter.parse(text)
+        f(c).writeText(text)
+        p(c).edit().putBoolean("imported", true).apply()
+    }
+    fun reset(c: Context) { f(c).delete(); p(c).edit().putBoolean("imported", false).apply() }
 }
 
 object SettingsManager {
-    val PICK = linkedMapOf("synergy" to 30.0, "counter" to 30.0, "winRate" to 20.0, "pickRate" to 10.0, "personal" to 10.0)
+    val PICK = linkedMapOf("synergy" to 25.0, "counter" to 25.0, "winRate" to 20.0, "laneRank" to 15.0, "roleWinRate" to 5.0, "pickRate" to 5.0, "personal" to 5.0)
     val BAN = linkedMapOf("threat" to 30.0, "counter" to 25.0, "enemySynergy" to 20.0, "winRate" to 15.0, "banRate" to 10.0)
     private fun p(c: Context) = c.getSharedPreferences("weights", 0)
     fun pick(c: Context): Map<String, Double> = PICK.mapValues { p(c).getFloat("pick_${it.key}", it.value.toFloat()).toDouble() }
