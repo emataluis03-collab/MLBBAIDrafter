@@ -115,7 +115,7 @@ class MainActivity : ComponentActivity() {
             addView(b("Stop overlay", red) { stopService(Intent(this@MainActivity, OverlayService::class.java)) })
         })
 
-        col.addView(card("AUTO DETECTION  // DETECTION STATUS: CaptureService controls screen capture; read-only recognition only.  (READ-ONLY)") {
+        col.addView(card("AUTO DETECTION  (READ-ONLY)") {
             detInfo = TextView(this@MainActivity).apply { setTextColor(white); textSize = 12f }
             addView(detInfo)
             addView(TextView(this@MainActivity).apply { setPadding(0, 0, 0, dp(6)) })

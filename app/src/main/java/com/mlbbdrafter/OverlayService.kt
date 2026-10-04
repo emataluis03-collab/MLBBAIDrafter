@@ -1038,3 +1038,65 @@ class OverlayService : Service() {
         dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
     }
 }
+
+
+/**
+ * Read-only draft detection guide.
+ * Draws a connector line from the detected slot toward the detected hero label.
+ * It never sends input events to Mobile Legends.
+ */
+private class DetectionLineView(context: android.content.Context) : View(context) {
+    data class Marker(
+        val left: Float,
+        val top: Float,
+        val right: Float,
+        val bottom: Float,
+        val label: String,
+        val confidence: Float
+    )
+
+    var marker: Marker? = null
+        set(value) { field = value; invalidate() }
+
+    private val linePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = android.graphics.Color.rgb(70, 255, 120)
+        strokeWidth = 2f
+        style = Paint.Style.STROKE
+    }
+    private val boxPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = android.graphics.Color.argb(170, 0, 20, 8)
+        style = Paint.Style.FILL
+    }
+    private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = android.graphics.Color.rgb(70, 255, 120)
+        textSize = 13f
+        typeface = Typeface.MONOSPACE
+    }
+
+    override fun onDraw(c: Canvas) {
+        super.onDraw(c)
+        val m = marker ?: return
+
+        // Detection rectangle around the detected hero portrait.
+        c.drawRect(m.left, m.top, m.right, m.bottom, linePaint)
+
+        // Connector line like the reference screenshot:
+        // portrait -> label.
+        val sx = m.right
+        val sy = (m.top + m.bottom) / 2f
+        val tx = (m.right + 80f).coerceAtMost(width - 8f)
+        val ty = sy
+        c.drawLine(sx, sy, tx, ty, linePaint)
+
+        val label = "✓ ${m.label}  ${(m.confidence * 100f).toInt()}%"
+        val pad = 8f
+        val tw = textPaint.measureText(label) + pad * 2
+        val th = 24f
+        val l = tx.coerceAtMost(width - tw - 4f)
+        val t = (ty - th / 2f).coerceIn(4f, height - th - 4f)
+
+        c.drawRoundRect(RectF(l, t, l + tw, t + th), 4f, 4f, boxPaint)
+        c.drawRoundRect(RectF(l, t, l + tw, t + th), 4f, 4f, linePaint)
+        c.drawText(label, l + pad, t + 16f, textPaint)
+    }
+}
