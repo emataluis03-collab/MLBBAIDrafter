@@ -41,8 +41,8 @@ class CaptureService : Service() {
         const val EXTRA_CONF = "confidence"
         private const val CHANNEL = "draft_detection"
         private const val NOTIFICATION_ID = 4401
-        private const val MIN_SCORE = 0.80      // correlation needed to count a frame
-        private const val MIN_MARGIN = 0.04     // best must beat the 2nd best hero by this much
+        private const val MIN_SCORE = 0.60      // correlation needed to count a frame
+        private const val MIN_MARGIN = 0.05     // best must beat the 2nd best hero by this much
         private const val STABLE_FRAMES = 3     // consecutive agreeing frames before the draft changes
         private const val FRAME_GAP_MS = 400L   // at most ~2.5 analysed frames per second
         private const val MAX_SIDE = 1280       // capture is downscaled: no need for full resolution
@@ -58,6 +58,9 @@ class CaptureService : Service() {
     private var capW = 0
     private var capH = 0
     private var started = false
+    private var frames = 0
+    private var lastStatus = 0L
+    private var names: Map<String, String> = emptyMap()
     private val streak = HashMap<String, Pair<String, Int>>()
     private val confirmed = HashMap<String, String>()
 
@@ -148,6 +151,7 @@ class CaptureService : Service() {
 
         // Templates are loaded ONCE here, not on every frame.
         val ds = Store.load(this)
+        names = ds.heroes.mapValues { it.value.name }
         val m = HeroTemplateMatcher(File(filesDir, "hero_templates"), ds.heroes)
         m.reload()
         matcher = m
@@ -205,30 +209,75 @@ class CaptureService : Service() {
         }
     }
 
+    private fun tag(s: DraftSlotLayout.SlotRect): String {
+        val k = when (s.kind) {
+            Slot.ALLY_BAN -> "AB"
+            Slot.ENEMY_BAN -> "EB"
+            Slot.ALLY_PICK -> "AP"
+            Slot.ENEMY_PICK -> "EP"
+        }
+        return k + (s.index + 1)
+    }
+
+    /** Rough screen brightness (0..100) from a sparse grid; ~0 means the frame is black. */
+    private fun brightness(f: Bitmap, w: Int, h: Int): Int {
+        var sum = 0.0
+        var n = 0
+        for (gy in 1..8) for (gx in 1..14) {
+            val c = f.getPixel(gx * (w - 1) / 15, gy * (h - 1) / 9)
+            sum += 0.299 * ((c shr 16) and 255) + 0.587 * ((c shr 8) and 255) + 0.114 * (c and 255)
+            n++
+        }
+        return (sum / n / 255.0 * 100.0).toInt()
+    }
+
     /** Looks only at the 20 draft-slot crops, never the whole frame. */
     private fun analyse(frame: Bitmap, w: Int, h: Int) {
         val m = matcher ?: return
-        if (m.size() == 0) return
-        for (s in DraftSlotLayout.slots()) {
-            val key = s.kind.name + ":" + s.index
-            val rect = Rect(
-                (s.rect.left * w).toInt(), (s.rect.top * h).toInt(),
-                (s.rect.right * w).toInt(), (s.rect.bottom * h).toInt()
-            )
-            val crop = frame.cropSafe(rect) ?: continue
-            val res = m.match(crop)
-            crop.recycle()
-            if (res == null || res.score < MIN_SCORE || res.margin < MIN_MARGIN) {
-                streak.remove(key)           // uncertain frame: never changes the draft
-                continue
+        frames++
+        var bestScore = -1.0
+        var bestId: String? = null
+        var bestWhere = ""
+        if (m.size() > 0) {
+            for (s in DraftSlotLayout.slots(this)) {
+                val key = s.kind.name + ":" + s.index
+                val rect = Rect(
+                    (s.rect.left * w).toInt(), (s.rect.top * h).toInt(),
+                    (s.rect.right * w).toInt(), (s.rect.bottom * h).toInt()
+                )
+                val crop = frame.cropSafe(rect) ?: continue
+                val res = m.match(crop)
+                crop.recycle()
+                if (res != null && res.score > bestScore) {
+                    bestScore = res.score
+                    bestId = res.id
+                    bestWhere = tag(s)
+                }
+                if (res == null || res.score < MIN_SCORE || res.margin < MIN_MARGIN) {
+                    streak.remove(key)           // uncertain frame: never changes the draft
+                    continue
+                }
+                val prev = streak[key]
+                val count = if (prev != null && prev.first == res.id) prev.second + 1 else 1
+                streak[key] = Pair(res.id, count)
+                if (count >= STABLE_FRAMES && confirmed[key] != res.id) {
+                    confirmed[key] = res.id
+                    sendResult(s, res.id, res.score)
+                }
             }
-            val prev = streak[key]
-            val count = if (prev != null && prev.first == res.id) prev.second + 1 else 1
-            streak[key] = Pair(res.id, count)
-            if (count >= STABLE_FRAMES && confirmed[key] != res.id) {
-                confirmed[key] = res.id
-                sendResult(s, res.id, res.score)
+        }
+        val t = SystemClock.elapsedRealtime()
+        if (t - lastStatus >= 1000L) {
+            lastStatus = t
+            val bright = brightness(frame, w, h)
+            val best = when {
+                m.size() == 0 -> "NO TEMPLATES"
+                bestId == null -> "no match"
+                else -> (names[bestId] ?: bestId) + " " + (bestScore * 100).toInt() + "% @" + bestWhere
             }
+            val verdict = if (m.size() > 0 && bestScore < MIN_SCORE) "UNKNOWN HERO - " else ""
+            sendStatus(verdict + "best: " + best + "\nframes " + frames + " | " + w + "x" + h + " | bright " + bright + "%" +
+                (if (bright < 3) " | BLACK FRAME?" else ""))
         }
     }
 

@@ -58,6 +58,10 @@ class OverlayService : Service() {
     private var detStatus = "DETECTION OFF"
     private var lineUntil = 0L
     private var guide: GuideView? = null
+    private var showBoxes = false
+    private var calGroup = 0
+    private val calKinds = listOf(Slot.ALLY_BAN, Slot.ENEMY_BAN, Slot.ALLY_PICK, Slot.ENEMY_PICK)
+    private val calNames = listOf("ALLY BANS", "ENEMY BANS", "ALLY PICKS", "ENEMY PICKS")
     private val detReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent == null || intent.action != CaptureService.ACTION_RESULT) return
@@ -169,7 +173,8 @@ class OverlayService : Service() {
         }
         // Restore the draft (the system may have restarted the service).
         d.fromJson(prefs.getString("draft", null)) { it in ds.heroes }
-        tab = prefs.getInt("tab", 0).coerceIn(0, 2)
+        tab = prefs.getInt("tab", 0).coerceIn(0, 3)
+        showBoxes = prefs.getBoolean("boxes", false)
         target = prefs.getInt("target", 0).coerceIn(0, 1)
 
         computeDefaults()
@@ -395,7 +400,7 @@ class OverlayService : Service() {
         panel.addView(hRow(30).apply { addView(title); addView(min); addView(close) })
 
         val tabRow = hRow(28)
-        listOf("DRAFT", "LANES", "BANS").forEachIndexed { i, name ->
+        listOf("DRAFT", "LANES", "BANS", "SCAN").forEachIndexed { i, name ->
             val t = tv(name, 9.5f, neon, true).apply {
                 gravity = Gravity.CENTER
                 letterSpacing = 0.06f
@@ -558,14 +563,30 @@ class OverlayService : Service() {
         private val bgPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = Color.argb(215, 5, 16, 10); style = Paint.Style.FILL
         }
+        private val boxPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = neon; strokeWidth = dp(1f); style = Paint.Style.STROKE
+        }
+        private val tagPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = Color.WHITE; textSize = dp(8f); typeface = Typeface.MONOSPACE
+        }
 
         override fun onDraw(c: Canvas) {
             super.onDraw(c)
-            val det = latest ?: return
-            if (System.currentTimeMillis() > lineUntil) return
-            val sr = DraftSlotLayout.slots().firstOrNull { it.kind == det.kind && it.index == det.index } ?: return
             val vw = width.toFloat()
             val vh = height.toFloat()
+            val all = DraftSlotLayout.slots(context)
+            if (showBoxes) {
+                for (s in all) {
+                    val r = RectF(s.rect.left * vw, s.rect.top * vh, s.rect.right * vw, s.rect.bottom * vh)
+                    boxPaint.color = if (s.kind == Slot.ALLY_BAN || s.kind == Slot.ALLY_PICK) neon else red
+                    c.drawRect(r, boxPaint)
+                    val tag = (if (s.kind == Slot.ALLY_BAN) "AB" else if (s.kind == Slot.ENEMY_BAN) "EB" else if (s.kind == Slot.ALLY_PICK) "AP" else "EP") + (s.index + 1)
+                    c.drawText(tag, r.left + dp(2f), r.top + dp(9f), tagPaint)
+                }
+            }
+            val det = latest ?: return
+            if (System.currentTimeMillis() > lineUntil) return
+            val sr = all.firstOrNull { it.kind == det.kind && it.index == det.index } ?: return
             val sx = sr.rect.centerX() * vw
             val sy = sr.rect.centerY() * vh
             val pw = if (lp.width > 0) lp.width else dp(56)
@@ -638,7 +659,8 @@ class OverlayService : Service() {
         when (tab) {
             0 -> draftTab(laneOf)
             1 -> lanesTab(filledByLane)
-            else -> bansTab()
+            2 -> bansTab()
+            else -> scanTab()
         }
     }
 
@@ -761,6 +783,68 @@ class OverlayService : Service() {
                     })
                 }
             }
+        })
+    }
+
+    /** Moves/resizes the box group being calibrated, so the boxes can be lined up with the real portraits. */
+    private fun nudge(dx: Float, dy: Float, sx: Float, sy: Float) {
+        val k = calKinds[calGroup]
+        val a = DraftSlotLayout.adjust(this, k)
+        a[0] += dx
+        a[1] += dy
+        a[2] = (a[2] + sx).coerceIn(0.3f, 3f)
+        a[3] = (a[3] + sy).coerceIn(0.3f, 3f)
+        DraftSlotLayout.setAdjust(this, k, a)
+        if (!showBoxes) {
+            showBoxes = true
+            prefs.edit().putBoolean("boxes", true).apply()
+        }
+        guide?.invalidate()
+    }
+
+    private fun scanTab() {
+        content.addView(card("SCAN STATUS", neon, "live") {
+            addView(tv(detStatus, 8.5f, white).apply { setPadding(dp(2), dp(1), 0, dp(2)) })
+            addView(tv("UNKNOWN / low confidence never changes the draft.", 7.5f, muted).apply { setPadding(dp(2), 0, 0, 0) })
+        })
+
+        content.addView(card("BOXES", amber, "where the scanner looks") {
+            addView(hRow(30).apply {
+                addView(button(if (showBoxes) "BOXES: ON" else "BOXES: OFF", if (showBoxes) neon else muted) {
+                    showBoxes = !showBoxes
+                    prefs.edit().putBoolean("boxes", showBoxes).apply()
+                    guide?.invalidate()
+                    refresh()
+                })
+            })
+            addView(tv("Green = ally, red = enemy. Line them up with the hero portraits.", 7.5f, muted).apply { setPadding(dp(2), dp(3), 0, 0) })
+        })
+
+        content.addView(card("CALIBRATE", blue, calNames[calGroup]) {
+            addView(hRow(30).apply {
+                addView(button("GROUP: " + calNames[calGroup], blue) { calGroup = (calGroup + 1) % calKinds.size; refresh() })
+            })
+            addView(spacer(3))
+            addView(hRow(30).apply {
+                addView(button("◀", neon) { nudge(-0.004f, 0f, 0f, 0f) })
+                addView(button("▶", neon) { nudge(0.004f, 0f, 0f, 0f) })
+                addView(button("▲", neon) { nudge(0f, -0.004f, 0f, 0f) })
+                addView(button("▼", neon) { nudge(0f, 0.004f, 0f, 0f) })
+            })
+            addView(spacer(3))
+            addView(hRow(30).apply {
+                addView(button("W+", amber) { nudge(0f, 0f, 0.03f, 0f) })
+                addView(button("W-", amber) { nudge(0f, 0f, -0.03f, 0f) })
+                addView(button("H+", amber) { nudge(0f, 0f, 0f, 0.03f) })
+                addView(button("H-", amber) { nudge(0f, 0f, 0f, -0.03f) })
+            })
+            addView(spacer(3))
+            addView(hRow(30).apply {
+                addView(button("RESET GROUP", red) {
+                    DraftSlotLayout.resetAdjust(this@OverlayService, calKinds[calGroup])
+                    guide?.invalidate()
+                })
+            })
         })
     }
 

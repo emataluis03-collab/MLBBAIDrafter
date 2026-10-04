@@ -1,5 +1,6 @@
 package com.mlbbdrafter
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Rect
@@ -10,8 +11,8 @@ import kotlin.math.sqrt
 
 /**
  * READ-ONLY geometry of the 20 draft slots, as fractions (0..1) of the screen.
- * These numbers are approximate (taken from a 1536x1067 reference screenshot). If detection looks at the
- * wrong place on your phone, this is the ONLY place to calibrate.
+ * Defaults are approximate (from a 1536x1067 reference screenshot). On the phone, the SCAN tab of the overlay
+ * can move/resize each group of boxes until they sit exactly on the portraits; that adjustment is saved.
  */
 object DraftSlotLayout {
     data class SlotRect(val kind: Slot, val index: Int, val rect: RectF)
@@ -24,10 +25,35 @@ object DraftSlotLayout {
         Slot.ENEMY_PICK to floatArrayOf(0.81f, 0.17f, 0.965f, 0.88f)
     )
 
+    private fun prefs(c: Context) = c.getSharedPreferences("calib", Context.MODE_PRIVATE)
+
+    /** [dx, dy, widthScale, heightScale] for one group of 5 slots. */
+    fun adjust(c: Context, k: Slot): FloatArray {
+        val out = floatArrayOf(0f, 0f, 1f, 1f)
+        val s = prefs(c).getString("cal_" + k.name, null) ?: return out
+        val p = s.split(",")
+        if (p.size == 4) for (i in 0 until 4) p[i].toFloatOrNull()?.let { out[i] = it }
+        return out
+    }
+
+    fun setAdjust(c: Context, k: Slot, a: FloatArray) {
+        prefs(c).edit().putString("cal_" + k.name, a.joinToString(",")).apply()
+    }
+
+    fun resetAdjust(c: Context, k: Slot) {
+        prefs(c).edit().remove("cal_" + k.name).apply()
+    }
+
     /** Normalised (0..1) rectangles. Multiply by the frame / screen size to get pixels. */
-    fun slots(): List<SlotRect> {
+    fun slots(c: Context): List<SlotRect> {
         val out = ArrayList<SlotRect>()
-        for ((kind, b) in bounds) {
+        for ((kind, b0) in bounds) {
+            val a = adjust(c, kind)
+            val cx = (b0[0] + b0[2]) / 2f + a[0]
+            val cy = (b0[1] + b0[3]) / 2f + a[1]
+            val hw = (b0[2] - b0[0]) / 2f * a[2]
+            val hh = (b0[3] - b0[1]) / 2f * a[3]
+            val b = floatArrayOf(cx - hw, cy - hh, cx + hw, cy + hh)
             val horizontal = kind == Slot.ALLY_BAN || kind == Slot.ENEMY_BAN
             for (i in 0 until 5) {
                 val r = if (horizontal) {
@@ -55,7 +81,7 @@ class HeroTemplateMatcher(private val templateDir: File, private val heroes: Map
 
     private val templates = ArrayList<Template>()
 
-    companion object { private const val N = 16 }
+    companion object { private const val N = 12 }
 
     fun size(): Int = templates.size
 
@@ -74,7 +100,7 @@ class HeroTemplateMatcher(private val templateDir: File, private val heroes: Map
         }
     }
 
-    /** Centre square -> 16x16 grayscale -> zero mean, unit length. Does not recycle [src]. */
+    /** Centre square -> 12x12 RGB -> zero mean, unit length. Does not recycle [src]. */
     private fun vectorOf(src: Bitmap): FloatArray {
         val side = minOf(src.width, src.height)
         val sq = Bitmap.createBitmap(src, (src.width - side) / 2, (src.height - side) / 2, side, side)
@@ -84,10 +110,12 @@ class HeroTemplateMatcher(private val templateDir: File, private val heroes: Map
         if (small !== sq) small.recycle()
         if (sq !== src) sq.recycle()
 
-        val g = FloatArray(N * N)
+        val g = FloatArray(N * N * 3)
         for (i in px.indices) {
             val c = px[i]
-            g[i] = (0.299f * ((c shr 16) and 255) + 0.587f * ((c shr 8) and 255) + 0.114f * (c and 255)) / 255f
+            g[i * 3] = ((c shr 16) and 255) / 255f
+            g[i * 3 + 1] = ((c shr 8) and 255) / 255f
+            g[i * 3 + 2] = (c and 255) / 255f
         }
         var mean = 0f
         for (x in g) mean += x
