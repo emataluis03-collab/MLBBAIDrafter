@@ -9,15 +9,11 @@ import java.io.File
 import java.util.Locale
 import kotlin.math.sqrt
 
-/**
- * READ-ONLY geometry of the 20 draft slots, as fractions (0..1) of the screen.
- * Defaults are approximate (from a 1536x1067 reference screenshot). On the phone, the SCAN tab of the overlay
- * can move/resize each group of boxes until they sit exactly on the portraits; that adjustment is saved.
- */
+/** READ-ONLY geometry of the 20 draft slots. */
 object DraftSlotLayout {
     data class SlotRect(val kind: Slot, val index: Int, val rect: RectF)
 
-    // left, top, right, bottom
+    // These are the user's existing box groups. Calibration, if present, is preserved.
     private val bounds = listOf(
         Slot.ALLY_BAN to floatArrayOf(0.035f, 0.085f, 0.205f, 0.145f),
         Slot.ENEMY_BAN to floatArrayOf(0.705f, 0.085f, 0.965f, 0.145f),
@@ -26,8 +22,6 @@ object DraftSlotLayout {
     )
 
     private fun prefs(c: Context) = c.getSharedPreferences("calib", Context.MODE_PRIVATE)
-
-    /** [dx, dy, widthScale, heightScale] for one group of 5 slots. */
     fun adjust(c: Context, k: Slot): FloatArray {
         val out = floatArrayOf(0f, 0f, 1f, 1f)
         val s = prefs(c).getString("cal_" + k.name, null) ?: return out
@@ -35,16 +29,9 @@ object DraftSlotLayout {
         if (p.size == 4) for (i in 0 until 4) p[i].toFloatOrNull()?.let { out[i] = it }
         return out
     }
+    fun setAdjust(c: Context, k: Slot, a: FloatArray) = prefs(c).edit().putString("cal_" + k.name, a.joinToString(",")).apply()
+    fun resetAdjust(c: Context, k: Slot) = prefs(c).edit().remove("cal_" + k.name).apply()
 
-    fun setAdjust(c: Context, k: Slot, a: FloatArray) {
-        prefs(c).edit().putString("cal_" + k.name, a.joinToString(",")).apply()
-    }
-
-    fun resetAdjust(c: Context, k: Slot) {
-        prefs(c).edit().remove("cal_" + k.name).apply()
-    }
-
-    /** Normalised (0..1) rectangles. Multiply by the frame / screen size to get pixels. */
     fun slots(c: Context): List<SlotRect> {
         val out = ArrayList<SlotRect>()
         for ((kind, b0) in bounds) {
@@ -71,25 +58,20 @@ object DraftSlotLayout {
 }
 
 /**
- * Lightweight local hero matcher.
- *
- * The first version compared only one tiny RGB square from each slot. That was very
- * sensitive to the MLBB frame/border, scaling and the different crop shape of bans
- * versus picks. This version compares several normalised centre crops and keeps the
- * best agreement. It is still completely local/read-only: it only looks at the slot
- * bitmap and the cached hero portraits.
+ * Local hero matcher. It deliberately uses several visual signatures instead of a single
+ * raw RGB correlation because the in-game portrait can have different scaling, brightness,
+ * borders and crop from the downloaded reference image.
  */
 class HeroTemplateMatcher(private val templateDir: File, private val heroes: Map<String, Hero>) {
     class Match(val id: String, val score: Double, val margin: Double)
 
-    private class Template(val id: String, val vectors: List<FloatArray>)
+    private data class Template(val id: String, val gray: FloatArray, val color: FloatArray, val edge: FloatArray)
+    private val templates = ArrayList<Template>()
 
     companion object {
         private const val N = 20
-        private const val INNER = 0.76f
+        private const val EDGE = 19
     }
-
-    private val templates = ArrayList<Template>()
 
     fun size(): Int = templates.size
 
@@ -103,116 +85,108 @@ class HeroTemplateMatcher(private val templateDir: File, private val heroes: Map
             val id = f.nameWithoutExtension
             if (!heroes.containsKey(id)) continue
             val bmp = BitmapFactory.decodeFile(f.absolutePath) ?: continue
-            val vectors = buildVectors(bmp)
+            templates.add(makeTemplate(id, bmp))
             bmp.recycle()
-            if (vectors.isNotEmpty()) templates.add(Template(id, vectors))
         }
     }
 
-    /** Build several robust descriptors from the same portrait. */
-    private fun buildVectors(src: Bitmap): List<FloatArray> {
+    private fun square(src: Bitmap, inset: Float = 0f): Bitmap {
         val side = minOf(src.width, src.height)
-        if (side < 2) return emptyList()
-        val left = (src.width - side) / 2
-        val top = (src.height - side) / 2
-        val square = Bitmap.createBitmap(src, left, top, side, side)
-        val out = ArrayList<FloatArray>(3)
-        out += vectorOf(square, 1f)
-        out += vectorOf(square, INNER)
-        // A slightly tighter crop helps when the downloaded portrait has a border
-        // that is not present in the in-game hero portrait.
-        out += vectorOf(square, 0.62f)
-        square.recycle()
-        return out
+        val cut = (side * inset).toInt()
+        val size = (side - cut * 2).coerceAtLeast(2)
+        return Bitmap.createBitmap(src, (src.width - side) / 2 + cut, (src.height - side) / 2 + cut, size, size)
     }
 
-    /** Crop the centre, resize to NxN, then normalise RGB channels independently. */
-    private fun vectorOf(src: Bitmap, fraction: Float): FloatArray {
-        val side = (minOf(src.width, src.height) * fraction).toInt().coerceAtLeast(2)
-        val sq = Bitmap.createBitmap(
-            src,
-            (src.width - side) / 2,
-            (src.height - side) / 2,
-            side,
-            side
-        )
+    private fun makeTemplate(id: String, src: Bitmap): Template {
+        val sq = square(src, 0.05f)
         val small = Bitmap.createScaledBitmap(sq, N, N, true)
         val px = IntArray(N * N)
         small.getPixels(px, 0, N, 0, 0, N, N)
         if (small !== sq) small.recycle()
         sq.recycle()
+        return features(id, px)
+    }
 
-        // Use luminance plus two chroma channels. This is more tolerant of the
-        // capture's brightness/overlay changes than raw RGB alone.
-        val v = FloatArray(N * N * 3)
+    private fun features(id: String, px: IntArray): Template {
+        val gray = FloatArray(N * N)
+        val color = FloatArray(12) // 4x3 coarse RGB histogram
         for (i in px.indices) {
             val r = ((px[i] shr 16) and 255) / 255f
             val g = ((px[i] shr 8) and 255) / 255f
             val b = (px[i] and 255) / 255f
-            val y = 0.299f * r + 0.587f * g + 0.114f * b
-            v[i * 3] = y
-            v[i * 3 + 1] = r - g
-            v[i * 3 + 2] = b - g
+            gray[i] = 0.299f * r + 0.587f * g + 0.114f * b
+            val bin = (i % N) / 5
+            color[bin * 3] += r
+            color[bin * 3 + 1] += g
+            color[bin * 3 + 2] += b
         }
-        normalise(v)
-        return v
+        normalize(color)
+        normalize(gray)
+        val edge = FloatArray(EDGE * EDGE)
+        for (y in 0 until EDGE) for (x in 0 until EDGE) {
+            val i = y * N + x
+            val gx = gray[i + 1] - gray[i]
+            val gy = gray[i + N] - gray[i]
+            edge[y * EDGE + x] = sqrt((gx * gx + gy * gy).toDouble()).toFloat()
+        }
+        normalize(edge)
+        return Template(id, gray, color, edge)
     }
 
-    private fun normalise(v: FloatArray) {
+    private fun normalize(a: FloatArray) {
         var mean = 0f
-        for (x in v) mean += x
-        mean /= v.size
+        for (v in a) mean += v
+        mean /= a.size
         var norm = 0f
-        for (i in v.indices) {
-            v[i] -= mean
-            norm += v[i] * v[i]
-        }
-        val len = kotlin.math.sqrt(norm.toDouble()).toFloat()
-        if (len > 1e-6f) for (i in v.indices) v[i] /= len
+        for (i in a.indices) { a[i] -= mean; norm += a[i] * a[i] }
+        val len = sqrt(norm.toDouble()).toFloat()
+        if (len > 1e-6f) for (i in a.indices) a[i] /= len
     }
 
-    private fun score(a: FloatArray, b: FloatArray): Double {
-        var dot = 0f
+    private fun candidate(src: Bitmap, inset: Float): Triple<FloatArray, FloatArray, FloatArray> {
+        val sq = square(src, inset)
+        val small = Bitmap.createScaledBitmap(sq, N, N, true)
+        val px = IntArray(N * N)
+        small.getPixels(px, 0, N, 0, 0, N, N)
+        if (small !== sq) small.recycle()
+        sq.recycle()
+        val t = features("", px)
+        return Triple(t.gray, t.color, t.edge)
+    }
+
+    private fun dot(a: FloatArray, b: FloatArray): Double {
+        var s = 0.0
         val n = minOf(a.size, b.size)
-        for (i in 0 until n) dot += a[i] * b[i]
-        // cosine is [-1,1]; map it to [0,1] for an easier confidence value.
-        return ((dot / n + 1f) / 2f).toDouble()
+        for (i in 0 until n) s += a[i] * b[i]
+        return s.coerceIn(-1.0, 1.0)
     }
 
     fun match(crop: Bitmap): Match? {
-        if (templates.isEmpty() || crop.width < 2 || crop.height < 2) return null
-        val query = buildVectors(crop)
-        if (query.isEmpty()) return null
-
-        var best = -1.0
-        var second = -1.0
+        if (templates.isEmpty()) return null
+        // Two crops reduce sensitivity to portrait borders and the exact box padding.
+        val c1 = candidate(crop, 0.05f)
+        val c2 = candidate(crop, 0.14f)
+        var best = -2.0
+        var second = -2.0
         var bestId: String? = null
-
         for (t in templates) {
-            var heroBest = -1.0
-            // Compare corresponding crop variants and also allow the strongest
-            // variant to win. This handles both ban and pick slot framing.
-            for (q in query) {
-                for (tv in t.vectors) {
-                    val s = score(q, tv)
-                    if (s > heroBest) heroBest = s
-                }
+            fun score(c: Triple<FloatArray, FloatArray, FloatArray>): Double {
+                val gray = ((dot(c.first, t.gray) + 1.0) / 2.0)
+                val color = ((dot(c.second, t.color) + 1.0) / 2.0)
+                val edge = ((dot(c.third, t.edge) + 1.0) / 2.0)
+                return gray * 0.55 + color * 0.20 + edge * 0.25
             }
-            if (heroBest > best) {
-                second = best
-                best = heroBest
-                bestId = t.id
-            } else if (heroBest > second) {
-                second = heroBest
-            }
+            val s = maxOf(score(c1), score(c2))
+            if (s > best) { second = best; best = s; bestId = t.id }
+            else if (s > second) second = s
         }
-
         val id = bestId ?: return null
         return Match(id, best.coerceIn(0.0, 1.0), (best - second).coerceAtLeast(0.0))
     }
 }
 
 fun Bitmap.cropSafe(rect: Rect): Bitmap? {
+    if (width <= 1 || height <= 1) return null
     val l = rect.left.coerceIn(0, width - 1)
     val t = rect.top.coerceIn(0, height - 1)
     val r = rect.right.coerceIn(l + 1, width)

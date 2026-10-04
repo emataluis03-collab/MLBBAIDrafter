@@ -41,10 +41,10 @@ class CaptureService : Service() {
         const val EXTRA_CONF = "confidence"
         private const val CHANNEL = "draft_detection"
         private const val NOTIFICATION_ID = 4401
-        private const val MIN_SCORE = 0.53      // correlation needed to count a frame
+        private const val MIN_SCORE = 0.52      // correlation needed to count a frame
         private const val MIN_MARGIN = 0.025     // best must beat the 2nd best hero by this much
         private const val STABLE_FRAMES = 2     // consecutive agreeing frames before the draft changes
-        private const val FRAME_GAP_MS = 400L   // at most ~2.5 analysed frames per second
+        private const val FRAME_GAP_MS = 300L   // at most ~2.5 analysed frames per second
         private const val MAX_SIDE = 1280       // capture is downscaled: no need for full resolution
     }
 
@@ -63,6 +63,7 @@ class CaptureService : Service() {
     private var names: Map<String, String> = emptyMap()
     private val streak = HashMap<String, Pair<String, Int>>()
     private val confirmed = HashMap<String, String>()
+    private val lastBest = HashMap<String, String>()
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -248,13 +249,16 @@ class CaptureService : Service() {
                 val crop = frame.cropSafe(rect) ?: continue
                 val res = m.match(crop)
                 crop.recycle()
-                if (res != null && res.score > bestScore) {
-                    bestScore = res.score
-                    bestId = res.id
-                    bestWhere = tag(s)
+                if (res != null) {
+                    lastBest[key] = (names[res.id] ?: res.id) + " " + (res.score * 100).toInt() + "%"
+                    if (res.score > bestScore) {
+                        bestScore = res.score
+                        bestId = res.id
+                        bestWhere = tag(s)
+                    }
                 }
                 if (res == null || res.score < MIN_SCORE || res.margin < MIN_MARGIN) {
-                    streak.remove(key)           // uncertain frame: never changes the draft
+                    streak.remove(key)
                     continue
                 }
                 val prev = streak[key]
@@ -276,7 +280,15 @@ class CaptureService : Service() {
                 else -> (names[bestId] ?: bestId) + " " + (bestScore * 100).toInt() + "% @" + bestWhere
             }
             val verdict = if (m.size() > 0 && bestScore < MIN_SCORE) "UNKNOWN HERO - " else ""
-            sendStatus(verdict + "best: " + best + "\nframes " + frames + " | " + w + "x" + h + " | bright " + bright + "%" +
+            val slotHints = listOf("AP1", "EP1", "AB1", "EB1").mapNotNull { prefix ->
+                lastBest.entries.firstOrNull { it.key.endsWith(":" + (prefix.drop(2).toIntOrNull()?.minus(1) ?: 0)) && it.key.startsWith(when(prefix.take(2)) {
+                    "AP" -> Slot.ALLY_PICK.name
+                    "EP" -> Slot.ENEMY_PICK.name
+                    "AB" -> Slot.ALLY_BAN.name
+                    else -> Slot.ENEMY_BAN.name
+                }) }?.let { prefix + "=" + it.value }
+            }.joinToString(" | ")
+            sendStatus(verdict + "best: " + best + "\n" + slotHints + "\nframes " + frames + " | " + w + "x" + h + " | bright " + bright + "%" +
                 (if (bright < 3) " | BLACK FRAME?" else ""))
         }
     }
