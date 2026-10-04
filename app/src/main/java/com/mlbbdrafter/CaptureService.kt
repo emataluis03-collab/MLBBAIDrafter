@@ -41,9 +41,9 @@ class CaptureService : Service() {
         const val EXTRA_CONF = "confidence"
         private const val CHANNEL = "draft_detection"
         private const val NOTIFICATION_ID = 4401
-        private const val MIN_SCORE = 0.60      // correlation needed to count a frame
-        private const val MIN_MARGIN = 0.05     // best must beat the 2nd best hero by this much
-        private const val STABLE_FRAMES = 3     // consecutive agreeing frames before the draft changes
+        private const val MIN_SCORE = 0.53      // correlation needed to count a frame
+        private const val MIN_MARGIN = 0.025     // best must beat the 2nd best hero by this much
+        private const val STABLE_FRAMES = 2     // consecutive agreeing frames before the draft changes
         private const val FRAME_GAP_MS = 400L   // at most ~2.5 analysed frames per second
         private const val MAX_SIDE = 1280       // capture is downscaled: no need for full resolution
     }
